@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace LibraryAppMVC.Controllers
 {
-    [Route("/simple")]
+    [Route("/simple/")]
     public class BookController : Controller
     {
         private Context _ctx;
@@ -17,7 +17,8 @@ namespace LibraryAppMVC.Controllers
             _ctx = context;
         }
 
-        [Route("/books")]
+
+        [Route("books")]
         public IActionResult GetABook()
         {
             var a = _ctx.Books

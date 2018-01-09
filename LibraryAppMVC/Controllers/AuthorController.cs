@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace LibraryAppMVC.Controllers
 {
-    [Route("/simple")]
+    [Route("/simple/")]
     public class AuthorController : Controller
     {
         private Context _ctx;
@@ -18,10 +18,11 @@ namespace LibraryAppMVC.Controllers
         }
 
 
-        [Route("/authors")]
+        [Route("authors")]
         public IActionResult GetAnAuthor()
         {
-            var a = _ctx.Authors.ToList();
+            var a = _ctx.Authors
+                    .ToList();
             return (Json(a));
         }
     }
