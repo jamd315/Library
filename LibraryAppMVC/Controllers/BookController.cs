@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace LibraryAppMVC.Controllers
 {
-    [Route("/other/")]
+    [Route("/simple")]
     public class BookController : Controller
     {
         private Context _ctx;
@@ -17,12 +17,12 @@ namespace LibraryAppMVC.Controllers
             _ctx = context;
         }
 
-        [Route("thing")]
+        [Route("/books")]
         public IActionResult GetABook()
         {
             var a = _ctx.Books
-                    .Where(b => b.PageCount > 10)
-                    .Select(b => new { title = b.Title }) //Anonymous object
+                    //.Where(b => b.PageCount > 10)
+                    //.Select(b => new { title = b.Title }) //Anonymous object
                     .ToList();
             return Json(a);
         }
