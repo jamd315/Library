@@ -11,9 +11,10 @@ using System;
 namespace DatabaseConnect.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20180117221920_rel_test1")]
+    partial class rel_test1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,19 +33,6 @@ namespace DatabaseConnect.Migrations
                     b.ToTable("tblAuthor");
                 });
 
-            modelBuilder.Entity("DatabaseConnect.Entities.AuthorBook", b =>
-                {
-                    b.Property<int>("BookID");
-
-                    b.Property<int>("AuthorID");
-
-                    b.HasKey("BookID", "AuthorID");
-
-                    b.HasIndex("AuthorID");
-
-                    b.ToTable("tblAuthorBook");
-                });
-
             modelBuilder.Entity("DatabaseConnect.Entities.Book", b =>
                 {
                     b.Property<int>("BookID")
@@ -57,19 +45,6 @@ namespace DatabaseConnect.Migrations
                     b.HasKey("BookID");
 
                     b.ToTable("tblBook");
-                });
-
-            modelBuilder.Entity("DatabaseConnect.Entities.AuthorBook", b =>
-                {
-                    b.HasOne("DatabaseConnect.Entities.Author", "Author")
-                        .WithMany("AuthorBooks")
-                        .HasForeignKey("AuthorID")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("DatabaseConnect.Entities.Book", "Book")
-                        .WithMany("AuthorBooks")
-                        .HasForeignKey("BookID")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

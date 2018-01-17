@@ -16,7 +16,7 @@ namespace DatabaseConnect.Entities
         [Key]
         public int AuthorID { get; set; }
         public string Name { get; set; }
-        public ICollection<Book> Books { get; set; }
+        public IEnumerable<AuthorBook> AuthorBooks { get; set; }
     }
 
     [Table("tblBook")]
@@ -26,11 +26,15 @@ namespace DatabaseConnect.Entities
         public int BookID { get; set; }
         public string Title { get; set; }
         public int PageCount { get; set; }
-        public ICollection<Author> Authors { get; set; }
+        public IEnumerable<AuthorBook> AuthorBooks { get; set; }
     }
 
+    [Table("tblAuthorBook")]
     public class AuthorBook
     {
-
+        public Author Author { get; set; }
+        public int AuthorID { get; set; }
+        public Book Book { get; set; }
+        public int BookID { get; set; }
     }
 }

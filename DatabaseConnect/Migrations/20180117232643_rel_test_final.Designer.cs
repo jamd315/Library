@@ -11,9 +11,10 @@ using System;
 namespace DatabaseConnect.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20180117232643_rel_test_final")]
+    partial class rel_test_final
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,7 +39,11 @@ namespace DatabaseConnect.Migrations
 
                     b.Property<int>("AuthorID");
 
+                    b.Property<int>("AuthBookID");
+
                     b.HasKey("BookID", "AuthorID");
+
+                    b.HasAlternateKey("AuthBookID");
 
                     b.HasIndex("AuthorID");
 
