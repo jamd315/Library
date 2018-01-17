@@ -22,8 +22,6 @@ namespace LibraryAppMVC.Controllers
         public IActionResult GetABook()
         {
             var a = _ctx.Books
-                    //.Where(b => b.PageCount > 10)
-                    //.Select(b => new { title = b.Title }) //Anonymous object
                     .ToList();
             return Json(a);
         }
@@ -32,6 +30,24 @@ namespace LibraryAppMVC.Controllers
         public IActionResult GetAnAuthor()
         {
             var a = _ctx.Authors
+                    .ToList();
+            return (Json(a));
+        }
+    }
+
+
+    [Route("/dev/")]
+    public class DevController : Controller
+    {
+        private Context _ctx;
+        public DevController(Context context)
+        {
+            _ctx = context;
+        }
+        [Route("authorbooks")]
+        public IActionResult GetAuthorBook()
+        {
+            var a = _ctx.AuthorBook_rel
                     .ToList();
             return (Json(a));
         }
