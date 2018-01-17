@@ -11,9 +11,10 @@ using System;
 namespace DatabaseConnect.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20180110000213_testing_relations3")]
+    partial class testing_relations3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,59 +23,42 @@ namespace DatabaseConnect.Migrations
 
             modelBuilder.Entity("DatabaseConnect.Entities.Author", b =>
                 {
-                    b.Property<int>("AuthorID")
+                    b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Name");
 
-                    b.HasKey("AuthorID");
+                    b.HasKey("ID");
 
                     b.ToTable("tblAuthor");
                 });
 
             modelBuilder.Entity("DatabaseConnect.Entities.Book", b =>
                 {
-                    b.Property<int>("BookID")
+                    b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("PageCount");
 
                     b.Property<string>("Title");
 
-                    b.HasKey("BookID");
+                    b.HasKey("ID");
 
                     b.ToTable("tblBook");
                 });
 
             modelBuilder.Entity("DatabaseConnect.Entities.BookAuthor", b =>
                 {
-                    b.Property<int>("BookAuthorID")
+                    b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("AuthorID");
 
                     b.Property<int>("BookID");
 
-                    b.HasKey("BookAuthorID");
-
-                    b.HasIndex("AuthorID");
-
-                    b.HasIndex("BookID");
+                    b.HasKey("ID");
 
                     b.ToTable("tblBookAuthor");
-                });
-
-            modelBuilder.Entity("DatabaseConnect.Entities.BookAuthor", b =>
-                {
-                    b.HasOne("DatabaseConnect.Entities.Author", "Author")
-                        .WithMany("BookAuthors")
-                        .HasForeignKey("AuthorID")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("DatabaseConnect.Entities.Book", "Book")
-                        .WithMany("BookAuthors")
-                        .HasForeignKey("BookID")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

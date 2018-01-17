@@ -11,9 +11,10 @@ using System;
 namespace DatabaseConnect.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20180110060935_testing_relations4")]
+    partial class testing_relations4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,7 +62,7 @@ namespace DatabaseConnect.Migrations
 
                     b.HasIndex("BookID");
 
-                    b.ToTable("tblBookAuthor");
+                    b.ToTable("BookAuthor");
                 });
 
             modelBuilder.Entity("DatabaseConnect.Entities.BookAuthor", b =>
