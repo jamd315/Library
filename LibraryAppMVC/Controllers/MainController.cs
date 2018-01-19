@@ -1,5 +1,6 @@
 ﻿using DatabaseConnect;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,9 +22,16 @@ namespace LibraryAppMVC.Controllers
         [Route("books")]
         public IActionResult GetABook()
         {
-            var a = _ctx.Books
-                    .ToList();
-            return Json(a);
+            var thing = new List<String>();
+            var books = _ctx.Books;
+            foreach (var b in books)
+            {
+                foreach (var ab in b.AuthorBooks)
+                {
+                    thing.Add(ab.Author.Name);
+                }
+            }
+            return Json(thing);
         }
 
         [Route("authors")]
