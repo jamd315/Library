@@ -25,9 +25,9 @@ namespace LibraryAppMVC.Controllers
         [Route("books")]
         public IActionResult GetABook()
         {
-            //var books = _ctx.Books.ToList();
-            var books = _ctx.Books;
-            return Json(books);
+            var a = _ctx.Books
+                    .ToList();
+            return Json(a);
         }
 
         [Route("authors")]
