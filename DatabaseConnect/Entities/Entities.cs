@@ -27,6 +27,8 @@ namespace DatabaseConnect.Entities
         public string Title { get; set; }
         public int PageCount { get; set; }
         public IEnumerable<AuthorBook> AuthorBooks { get; set; }
+        [NotMapped]
+        public List<Author> Authors { get; set; }
     }
 
     [Table("tblAuthorBook")]

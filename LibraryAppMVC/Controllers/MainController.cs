@@ -1,10 +1,14 @@
 ﻿using DatabaseConnect;
+using DatabaseConnect.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace LibraryAppMVC.Controllers
 {
@@ -21,9 +25,9 @@ namespace LibraryAppMVC.Controllers
         [Route("books")]
         public IActionResult GetABook()
         {
-            var a = _ctx.Books
-                    .ToList();
-            return Json(a);
+            //var books = _ctx.Books.ToList();
+            var books = _ctx.Books;
+            return Json(books);
         }
 
         [Route("authors")]
@@ -44,6 +48,7 @@ namespace LibraryAppMVC.Controllers
         {
             _ctx = context;
         }
+
         [Route("authorbooks")]
         public IActionResult GetAuthorBook()
         {
