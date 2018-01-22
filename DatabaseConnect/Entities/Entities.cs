@@ -26,6 +26,7 @@ namespace DatabaseConnect.Entities
         public int BookID { get; set; }
         public string Title { get; set; }
         public int PageCount { get; set; }
+        public Cover Cover { get; set; }
         public IEnumerable<AuthorBook> AuthorBooks { get; set; }
         [NotMapped]
         public List<Author> Authors { get; set; }
@@ -38,5 +39,15 @@ namespace DatabaseConnect.Entities
         public int AuthorID { get; set; }
         public Book Book { get; set; }
         public int BookID { get; set; }
+    }
+
+    [Table("tblCovers")]
+    public class Cover
+    {
+        [Key]
+        public int CoverID { get; set; }
+        public int BookID { get; set; }
+        public Book Book { get; set; }
+        public String Base64Encoded { get; set; }
     }
 }

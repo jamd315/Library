@@ -26,7 +26,8 @@ namespace LibraryAppMVC.Controllers
         public IActionResult GetABook()
         {
             var a = _ctx.Books
-                    .ToList();
+                .Include(book => book.Cover)
+                .ToList();
             return Json(a);
         }
 
@@ -34,7 +35,7 @@ namespace LibraryAppMVC.Controllers
         public IActionResult GetAnAuthor()
         {
             var a = _ctx.Authors
-                    .ToList();
+                .ToList();
             return (Json(a));
         }
     }
@@ -53,7 +54,7 @@ namespace LibraryAppMVC.Controllers
         public IActionResult GetAuthorBook()
         {
             var a = _ctx.AuthorBook_rel
-                    .ToList();
+                .ToList();
             return (Json(a));
         }
     }
