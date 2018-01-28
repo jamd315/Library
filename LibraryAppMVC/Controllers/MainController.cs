@@ -1,5 +1,6 @@
 ﻿using DatabaseConnect;
 using DatabaseConnect.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -16,21 +17,35 @@ namespace LibraryAppMVC.Controllers
     public class MainController : Controller
     {
         private Context _ctx;
+
         public MainController(Context context)
         {
             _ctx = context;
         }
 
-
         [Route("books")]
-        public IActionResult GetABook()
+        public IActionResult GetABook(string title)
         {
-            var a = _ctx.Books
-                .Include(book => book.Cover)
-                .ToList();
+            List<Book> a;
+            if (title != null)
+            {
+                a = _ctx.Books
+                    .Where(b => b.Title.Contains(title))
+                    .Include(book => book.Cover)
+                    .Include(book => book.Authors)  // This causes an error
+                    .ToList();
+            }
+            else
+            {
+                a = _ctx.Books
+                    .Include(book => book.Cover)
+                    .Include(book => book.Authors)  // This causes an error
+                    .ToList();
+            }
             return Json(a);
         }
 
+        [Authorize]
         [Route("authors")]
         public IActionResult GetAnAuthor()
         {

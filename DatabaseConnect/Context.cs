@@ -18,8 +18,10 @@ namespace DatabaseConnect
         public DbSet<Book> Books { get; set; }
         public DbSet<Author> Authors { get; set; }
         public DbSet<Cover> Covers { get; set; }
+        public DbSet<User> Users { get; set; }
         // Relationships
         public DbSet<AuthorBook> AuthorBook_rel { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -29,7 +29,8 @@ namespace DatabaseConnect.Entities
         public Cover Cover { get; set; }
         public IEnumerable<AuthorBook> AuthorBooks { get; set; }
         [NotMapped]
-        public List<Author> Authors { get; set; }
+        public List<Author> Authors { get; set; }  // Doesn't work
+        public String ISBN { get; set; }
     }
 
     [Table("tblAuthorBook")]
@@ -49,5 +50,14 @@ namespace DatabaseConnect.Entities
         public int BookID { get; set; }
         public Book Book { get; set; }
         public String Base64Encoded { get; set; }
+    }
+
+    [Table("tblUsers")]
+    public class User
+    {
+        [Key]
+        public int UserID { get; set; }
+        public String FullName { get; set; }
+        public int SchoolID { get; set; }
     }
 }
