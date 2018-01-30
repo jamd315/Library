@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraryAppMVC", "LibraryApp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseConnect", "DatabaseConnect\DatabaseConnect.csproj", "{4B899F9E-21F6-497E-843D-BBD896BB7151}"
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "ImgIngest", "..\..\..\source\repos\ImgIngest\ImgIngest\ImgIngest.pyproj", "{4C56840D-F43C-4CBF-862C-B3F44622EE05}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,11 +23,13 @@ Global
 		{4B899F9E-21F6-497E-843D-BBD896BB7151}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B899F9E-21F6-497E-843D-BBD896BB7151}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B899F9E-21F6-497E-843D-BBD896BB7151}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C56840D-F43C-4CBF-862C-B3F44622EE05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C56840D-F43C-4CBF-862C-B3F44622EE05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {71A56710-22E8-4A83-8A3F-14BEF0D16F73}
+		SolutionGuid = {FC7565A1-16AC-465B-9121-903F72B64AA8}
 	EndGlobalSection
 EndGlobal

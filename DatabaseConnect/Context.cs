@@ -19,14 +19,16 @@ namespace DatabaseConnect
         public DbSet<Author> Authors { get; set; }
         public DbSet<Cover> Covers { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<UType> UTypes { get; set; }
         // Relationships
         public DbSet<AuthorBook> AuthorBook_rel { get; set; }
+        public DbSet<UserUType> UserUType_rel { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<AuthorBook>()  // Composite Key
-            .HasKey(t => new { t.BookID, t.AuthorID });
+            .HasKey(ab => new { ab.BookID, ab.AuthorID });
 
             modelBuilder.Entity<AuthorBook>()  // One to many AuthorBooks.Book to Book
                 .HasOne(ab => ab.Book)

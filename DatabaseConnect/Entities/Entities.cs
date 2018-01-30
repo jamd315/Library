@@ -60,4 +60,23 @@ namespace DatabaseConnect.Entities
         public String FullName { get; set; }
         public int SchoolID { get; set; }
     }
+
+    [Table("tblUType")]
+    public class UType
+    {
+        [Key]
+        public int UTypeID { get; set; }
+        public String UTypeName { get; set; }
+        public Boolean WriteAccess { get; set; }
+        public int CheckoutLimit { get; set; }
+    }
+
+    [Table("tblUserUType")]
+    public class UserUType
+    {
+        public User User { get; set; }
+        public int UserID { get; set; }
+        public UType UType { get; set; }
+        public int UTypeID { get; set; }
+    }
 }
