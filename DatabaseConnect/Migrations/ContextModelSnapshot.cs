@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
 
 namespace DatabaseConnect.Migrations
@@ -23,9 +25,13 @@ namespace DatabaseConnect.Migrations
                     b.Property<int>("AuthorID")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int?>("BookID");
+
                     b.Property<string>("Name");
 
                     b.HasKey("AuthorID");
+
+                    b.HasIndex("BookID");
 
                     b.ToTable("tblAuthor");
                 });
@@ -47,6 +53,8 @@ namespace DatabaseConnect.Migrations
                 {
                     b.Property<int>("BookID")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ISBN");
 
                     b.Property<int>("PageCount");
 
@@ -88,6 +96,42 @@ namespace DatabaseConnect.Migrations
                     b.ToTable("tblUsers");
                 });
 
+            modelBuilder.Entity("DatabaseConnect.Entities.UserUType", b =>
+                {
+                    b.Property<int>("UserID");
+
+                    b.Property<int>("UTypeID");
+
+                    b.HasKey("UserID", "UTypeID");
+
+                    b.HasIndex("UTypeID");
+
+                    b.ToTable("tblUserUType");
+                });
+
+            modelBuilder.Entity("DatabaseConnect.Entities.UType", b =>
+                {
+                    b.Property<int>("UTypeID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("CheckoutLimit");
+
+                    b.Property<string>("UTypeName");
+
+                    b.Property<bool>("WriteAccess");
+
+                    b.HasKey("UTypeID");
+
+                    b.ToTable("tblUType");
+                });
+
+            modelBuilder.Entity("DatabaseConnect.Entities.Author", b =>
+                {
+                    b.HasOne("DatabaseConnect.Entities.Book")
+                        .WithMany("Authors")
+                        .HasForeignKey("BookID");
+                });
+
             modelBuilder.Entity("DatabaseConnect.Entities.AuthorBook", b =>
                 {
                     b.HasOne("DatabaseConnect.Entities.Author", "Author")
@@ -106,6 +150,19 @@ namespace DatabaseConnect.Migrations
                     b.HasOne("DatabaseConnect.Entities.Book", "Book")
                         .WithOne("Cover")
                         .HasForeignKey("DatabaseConnect.Entities.Cover", "BookID")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("DatabaseConnect.Entities.UserUType", b =>
+                {
+                    b.HasOne("DatabaseConnect.Entities.UType", "UType")
+                        .WithMany()
+                        .HasForeignKey("UTypeID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("DatabaseConnect.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

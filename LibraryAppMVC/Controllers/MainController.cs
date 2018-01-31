@@ -31,27 +31,20 @@ namespace LibraryAppMVC.Controllers
             {
                 a = _ctx.Books
                     .Where(b => b.Title.Contains(title))
-                    .Include(book => book.Cover)
-                    .Include(book => book.Authors)  // This causes an error
+                    //.Include(book => book.Cover)
+                    .Include(book => book.AuthorBooks)
+                        .ThenInclude(ab => ab.Author)
                     .ToList();
             }
             else
             {
                 a = _ctx.Books
-                    .Include(book => book.Cover)
-                    .Include(book => book.Authors)  // This causes an error
+                    //.Include(book => book.Cover)
+                    .Include(book => book.AuthorBooks)
+                        .ThenInclude(ab => ab.Author)
                     .ToList();
             }
             return Json(a);
-        }
-
-        [Authorize]
-        [Route("authors")]
-        public IActionResult GetAnAuthor()
-        {
-            var a = _ctx.Authors
-                .ToList();
-            return (Json(a));
         }
     }
 
@@ -63,6 +56,14 @@ namespace LibraryAppMVC.Controllers
         public DevController(Context context)
         {
             _ctx = context;
+        }
+
+        [Route("authors")]
+        public IActionResult GetAnAuthor()
+        {
+            var a = _ctx.Authors
+                .ToList();
+            return (Json(a));
         }
 
         [Route("authorbooks")]

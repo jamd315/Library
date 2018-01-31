@@ -27,8 +27,8 @@ namespace DatabaseConnect
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<AuthorBook>()  // Composite Key
-            .HasKey(ab => new { ab.BookID, ab.AuthorID });
+            modelBuilder.Entity<AuthorBook>()  // Composite Key for AuthorBooks
+                .HasKey(ab => new { ab.BookID, ab.AuthorID });
 
             modelBuilder.Entity<AuthorBook>()  // One to many AuthorBooks.Book to Book
                 .HasOne(ab => ab.Book)
@@ -39,6 +39,9 @@ namespace DatabaseConnect
                 .HasOne(ab => ab.Author)
                 .WithMany(a => a.AuthorBooks)
                 .HasForeignKey(ab => ab.AuthorID);
+
+            modelBuilder.Entity<UserUType>()
+                .HasKey(ut => new { ut.UserID, ut.UTypeID });
         }
     }
 }

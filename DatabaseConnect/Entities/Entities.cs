@@ -28,8 +28,7 @@ namespace DatabaseConnect.Entities
         public int PageCount { get; set; }
         public Cover Cover { get; set; }
         public IEnumerable<AuthorBook> AuthorBooks { get; set; }
-        [NotMapped]
-        public List<Author> Authors { get; set; }  // Doesn't work
+        public IEnumerable<Author> Authors { get; set; }  // Doesn't work
         public String ISBN { get; set; }
     }
 
