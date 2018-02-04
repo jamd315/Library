@@ -28,26 +28,61 @@ namespace LibraryAppMVC.Controllers
         [HttpPost]
         public IActionResult BookCheckout(string bookid, string userid)
         {
-            int B_id = Int32.Parse(bookid);
-            int U_id = Int32.Parse(userid);
+            int B_id, U_id;
+            try
+            {
+                B_id = Int32.Parse(bookid);
+                U_id = Int32.Parse(userid);
+            }
+            catch
+            {
+                return StatusCode(400); // Catch non-int requests
+            }
+
+            int limit = _ctx.UserUType_rel
+                .Where(ut => ut.UserID == U_id)
+                .Include(ut => ut.UType)
+                .First()
+                .UType
+                .CheckoutLimit;
+
+            int current = _ctx.Checkouts
+                .Where(c => c.Active)
+                .Where(c => c.UserID == U_id)
+                .Count();
+
+            if(current >= limit)
+            {
+                return StatusCode(403);
+            }
+
+
             _ctx.Checkouts
                 .Add(new Checkout { BookID = B_id, UserID = U_id, Active=true });
             _ctx.SaveChanges();
-            return new EmptyResult();
+            return StatusCode(200);
         }
 
         [Route("checkin")]
         [HttpPost]
         public IActionResult BookCheckin(string bookid, string userid)
         {
-            int B_id = Int32.Parse(bookid);
-            int U_id = Int32.Parse(userid);
+            int B_id, U_id;
+            try
+            {
+                B_id = Int32.Parse(bookid);
+                U_id = Int32.Parse(userid);
+            }
+            catch
+            {
+                return StatusCode(400); // Catch non-int requests
+            }
             _ctx.Checkouts
                 .Where(c => c.BookID == B_id && c.UserID == U_id)
-                .First()
+                .First()  // TODO is this bad?
                 .Active = false;
             _ctx.SaveChanges();
-            return new EmptyResult();
+            return StatusCode(200);
         }
     }
     [Route("/simple/")]
