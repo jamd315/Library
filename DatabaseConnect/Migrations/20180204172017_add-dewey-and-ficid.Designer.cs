@@ -11,9 +11,10 @@ using System;
 namespace DatabaseConnect.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20180204172017_add-dewey-and-ficid")]
+    partial class adddeweyandficid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,7 +55,7 @@ namespace DatabaseConnect.Migrations
                     b.Property<int>("BookID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("DeweyDecimal");
+                    b.Property<int>("DeweyDecimal");
 
                     b.Property<string>("FicID");
 
@@ -67,21 +68,6 @@ namespace DatabaseConnect.Migrations
                     b.HasKey("BookID");
 
                     b.ToTable("tblBook");
-                });
-
-            modelBuilder.Entity("DatabaseConnect.Entities.Checkout", b =>
-                {
-                    b.Property<int>("UserID");
-
-                    b.Property<int>("BookID");
-
-                    b.Property<bool>("Active");
-
-                    b.HasKey("UserID", "BookID");
-
-                    b.HasIndex("BookID");
-
-                    b.ToTable("tblCheckouts");
                 });
 
             modelBuilder.Entity("DatabaseConnect.Entities.Cover", b =>
@@ -161,19 +147,6 @@ namespace DatabaseConnect.Migrations
                     b.HasOne("DatabaseConnect.Entities.Book", "Book")
                         .WithMany("AuthorBooks")
                         .HasForeignKey("BookID")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("DatabaseConnect.Entities.Checkout", b =>
-                {
-                    b.HasOne("DatabaseConnect.Entities.Book", "Book")
-                        .WithMany()
-                        .HasForeignKey("BookID")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("DatabaseConnect.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

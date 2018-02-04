@@ -11,9 +11,10 @@ using System;
 namespace DatabaseConnect.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20180204184309_no-ISBN")]
+    partial class noISBN
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,8 +59,6 @@ namespace DatabaseConnect.Migrations
 
                     b.Property<string>("FicID");
 
-                    b.Property<string>("ISBN");
-
                     b.Property<int>("PageCount");
 
                     b.Property<string>("Title");
@@ -74,8 +73,6 @@ namespace DatabaseConnect.Migrations
                     b.Property<int>("UserID");
 
                     b.Property<int>("BookID");
-
-                    b.Property<bool>("Active");
 
                     b.HasKey("UserID", "BookID");
 

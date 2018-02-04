@@ -20,6 +20,7 @@ namespace DatabaseConnect
         public DbSet<Cover> Covers { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<UType> UTypes { get; set; }
+        public DbSet<Checkout> Checkouts { get; set; }
         // Relationships
         public DbSet<AuthorBook> AuthorBook_rel { get; set; }
         public DbSet<UserUType> UserUType_rel { get; set; }
@@ -40,8 +41,11 @@ namespace DatabaseConnect
                 .WithMany(a => a.AuthorBooks)
                 .HasForeignKey(ab => ab.AuthorID);
 
-            modelBuilder.Entity<UserUType>()
+            modelBuilder.Entity<UserUType>()  // Composite Key
                 .HasKey(ut => new { ut.UserID, ut.UTypeID });
+
+            modelBuilder.Entity<Checkout>()
+                .HasKey(c => new { c.UserID, c.BookID });
         }
     }
 }

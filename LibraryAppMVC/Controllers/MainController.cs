@@ -7,12 +7,49 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
 namespace LibraryAppMVC.Controllers
 {
+    [Route("/library/")]
+    public class CheckoutController : Controller
+    {
+        private Context _ctx;
+
+        public CheckoutController(Context context)
+        {
+            _ctx = context;
+        }
+
+        [Route("checkout")]
+        [HttpPost]
+        public IActionResult BookCheckout(string bookid, string userid)
+        {
+            int B_id = Int32.Parse(bookid);
+            int U_id = Int32.Parse(userid);
+            _ctx.Checkouts
+                .Add(new Checkout { BookID = B_id, UserID = U_id, Active=true });
+            _ctx.SaveChanges();
+            return new EmptyResult();
+        }
+
+        [Route("checkin")]
+        [HttpPost]
+        public IActionResult BookCheckin(string bookid, string userid)
+        {
+            int B_id = Int32.Parse(bookid);
+            int U_id = Int32.Parse(userid);
+            _ctx.Checkouts
+                .Where(c => c.BookID == B_id && c.UserID == U_id)
+                .First()
+                .Active = false;
+            _ctx.SaveChanges();
+            return new EmptyResult();
+        }
+    }
     [Route("/simple/")]
     public class MainController : Controller
     {

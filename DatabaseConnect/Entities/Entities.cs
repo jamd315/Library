@@ -30,6 +30,8 @@ namespace DatabaseConnect.Entities
         public IEnumerable<AuthorBook> AuthorBooks { get; set; }
         public IEnumerable<Author> Authors { get; set; }  // Doesn't work
         public String ISBN { get; set; }
+        public String DeweyDecimal { get; set; }
+        public String FicID { get; set; }
     }
 
     [Table("tblAuthorBook")]
@@ -77,5 +79,15 @@ namespace DatabaseConnect.Entities
         public int UserID { get; set; }
         public UType UType { get; set; }
         public int UTypeID { get; set; }
+    }
+
+    [Table("tblCheckouts")]
+    public class Checkout
+    {
+        public User User { get; set; }
+        public int UserID { get; set; }
+        public Book Book { get; set; }
+        public int BookID { get; set; }
+        public Boolean Active { get; set; }
     }
 }
