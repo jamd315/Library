@@ -32,6 +32,7 @@ namespace DatabaseConnect.Entities
         public String ISBN { get; set; }
         public String DeweyDecimal { get; set; }
         public String FicID { get; set; }
+        public String SpecialCollection { get; set; }
     }
 
     [Table("tblAuthorBook")]

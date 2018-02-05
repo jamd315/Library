@@ -131,6 +131,7 @@ namespace LibraryAppMVC.Controllers
         }
 
         [Route("authors")]
+        [Authorize]
         public IActionResult GetAnAuthor()
         {
             var a = _ctx.Authors
