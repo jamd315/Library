@@ -59,7 +59,8 @@ namespace LibraryAppMVC.Controllers
         private UserModel Authenticate(LoginModel login)
         {
             UserModel user = null;
-            if(login.Username == "admin" && login.Password == "password") // TODO this
+            //if(login.Username == "admin" && login.Password == "password") // TODO this
+            if(true)
             {
                 user = new UserModel { Name = "Admin" };
             }
@@ -93,27 +94,27 @@ namespace LibraryAppMVC.Controllers
 
         [Route("checkout")]
         [HttpPost]
-        public IActionResult BookCheckout(string bookid, string userid)
+        public IActionResult BookCheckout([FromBody]string bookid, [FromBody]string userid)
         {
             int B_id, U_id;
-            try
+            try // Catch non-int requests
             {
                 B_id = Int32.Parse(bookid);
                 U_id = Int32.Parse(userid);
             }
             catch
             {
-                return StatusCode(400); // Catch non-int requests
+                return StatusCode(400);
             }
 
-            int limit = _ctx.UserUType_rel
+            int limit = _ctx.UserUType_rel // Get max checked out books for usertype
                 .Where(ut => ut.UserID == U_id)
                 .Include(ut => ut.UType)
                 .First()
                 .UType
                 .CheckoutLimit;
 
-            int current = _ctx.Checkouts
+            int current = _ctx.Checkouts // Get current user checkout out books
                 .Where(c => c.Active)
                 .Where(c => c.UserID == U_id)
                 .Count();
