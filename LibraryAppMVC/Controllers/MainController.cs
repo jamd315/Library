@@ -59,8 +59,7 @@ namespace LibraryAppMVC.Controllers
         private UserModel Authenticate(LoginModel login)
         {
             UserModel user = null;
-            //if(login.Username == "admin" && login.Password == "password") // TODO this
-            if(true)
+            if(login.Username == "admin" && login.Password == "password")
             {
                 user = new UserModel { Name = "Admin" };
             }
