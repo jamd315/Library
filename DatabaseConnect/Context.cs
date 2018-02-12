@@ -21,6 +21,7 @@ namespace DatabaseConnect
         public DbSet<User> Users { get; set; }
         public DbSet<UType> UTypes { get; set; }
         public DbSet<Checkout> Checkouts { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
         // Relationships
         public DbSet<AuthorBook> AuthorBook_rel { get; set; }
         public DbSet<UserUType> UserUType_rel { get; set; }
@@ -43,9 +44,6 @@ namespace DatabaseConnect
 
             modelBuilder.Entity<UserUType>()  // Composite Key
                 .HasKey(ut => new { ut.UserID, ut.UTypeID });
-
-            modelBuilder.Entity<Checkout>()
-                .HasKey(c => new { c.UserID, c.BookID });
         }
     }
 }

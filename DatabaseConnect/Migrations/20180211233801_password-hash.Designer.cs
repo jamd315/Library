@@ -11,9 +11,10 @@ using System;
 namespace DatabaseConnect.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20180211233801_password-hash")]
+    partial class passwordhash
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -138,8 +139,6 @@ namespace DatabaseConnect.Migrations
                     b.Property<string>("FullName");
 
                     b.Property<string>("PasswordHash");
-
-                    b.Property<string>("Salt");
 
                     b.Property<string>("SchoolID");
 

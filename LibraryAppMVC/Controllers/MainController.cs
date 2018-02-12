@@ -1,9 +1,11 @@
 ﻿using DatabaseConnect;
 using DatabaseConnect.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -11,7 +13,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -22,10 +26,14 @@ namespace LibraryAppMVC.Controllers
     public class LoginController : Controller
     {
         private IConfiguration _config;
+        private Context _ctx;
+        private readonly ILogger _logger;
 
-        public LoginController(IConfiguration config)
+        public LoginController(IConfiguration config, Context context, ILogger<LoginController> logger)
         {
             _config = config;
+            _ctx = context;
+            _logger = logger;
         }
 
 
@@ -58,12 +66,36 @@ namespace LibraryAppMVC.Controllers
 
         private UserModel Authenticate(LoginModel login)
         {
-            UserModel user = null;
-            if(login.Username == "admin" && login.Password == "password")
+            User User;
+            UserModel usermodel = null;
+            try
             {
-                user = new UserModel { Name = "Admin" };
+                User =_ctx.Users
+                    .Where(u => u.SchoolID.Equals(login.Username))
+                    .First();
+                
             }
-            return user;
+            catch
+            {
+                return null;
+            }
+            if(VerifyPass(login.Password, User.Salt, User.PasswordHash))
+            {
+                usermodel = new UserModel { Name = User.FullName };
+            }
+            return usermodel;
+        }
+
+        private Boolean VerifyPass(String RawPass, String Salt, String PasswordHash)
+        {
+            byte[] salt_array = Convert.FromBase64String(Salt);
+            String hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: RawPass,
+                salt: salt_array,
+                prf: KeyDerivationPrf.HMACSHA1,
+                iterationCount: 10000,
+                numBytesRequested: 256 / 8));
+            return hashed.Equals(PasswordHash);
         }
 
         public class LoginModel
@@ -91,66 +123,88 @@ namespace LibraryAppMVC.Controllers
             _ctx = context;
         }
 
+        public class TransactionRequest
+        {
+            public int BookID { get; set; }
+            public int UserID { get; set; }
+        }
+
         [Route("checkout")]
         [HttpPost]
-        public IActionResult BookCheckout([FromBody]string bookid, [FromBody]string userid)
+        [Authorize]
+        public IActionResult BookCheckout([FromBody]TransactionRequest request)
         {
-            int B_id, U_id;
-            try // Catch non-int requests
-            {
-                B_id = Int32.Parse(bookid);
-                U_id = Int32.Parse(userid);
-            }
-            catch
-            {
-                return StatusCode(400);
-            }
-
             int limit = _ctx.UserUType_rel // Get max checked out books for usertype
-                .Where(ut => ut.UserID == U_id)
+                .Where(ut => ut.UserID == request.UserID)
                 .Include(ut => ut.UType)
                 .First()
                 .UType
                 .CheckoutLimit;
 
-            int current = _ctx.Checkouts // Get current user checkout out books
+            int current = _ctx.Checkouts // Get current user checked out books
                 .Where(c => c.Active)
-                .Where(c => c.UserID == U_id)
+                .Where(c => c.UserID == request.UserID)
                 .Count();
 
-            if(current >= limit)
+            if (current >= limit)  // Check to see if user can checkout more books
             {
-                return StatusCode(403);
+                return Forbid($"You already have checked out {current} books, as many as you can.");
+            }
+
+            bool CheckedOut = _ctx.Checkouts
+                .Where(c => c.Active && c.BookID.Equals(request.BookID))
+                .Count() > 0;
+
+            if (CheckedOut)
+            {
+                return Forbid("Already checked out");
             }
 
 
             _ctx.Checkouts
-                .Add(new Checkout { BookID = B_id, UserID = U_id, Active=true });
+                .Add(new Checkout { BookID = request.BookID, UserID = request.UserID, Active=true });
             _ctx.SaveChanges();
-            return StatusCode(200);
+            return Ok();
         }
 
         [Route("checkin")]
         [HttpPost]
-        public IActionResult BookCheckin(string bookid, string userid)
+        [Authorize]
+        public IActionResult BookCheckin([FromBody]TransactionRequest request)
         {
-            int B_id, U_id;
-            try
-            {
-                B_id = Int32.Parse(bookid);
-                U_id = Int32.Parse(userid);
-            }
-            catch
-            {
-                return StatusCode(400); // Catch non-int requests
-            }
             _ctx.Checkouts
-                .Where(c => c.BookID == B_id && c.UserID == U_id)
-                .First()  // TODO is this bad?
+                .Where(c => c.BookID == request.BookID && c.UserID == request.UserID)
+                .Last()
                 .Active = false;
             _ctx.SaveChanges();
-            return StatusCode(200);
+            return Ok();
         }
+
+        [Route("reserve")]
+        [HttpPost]
+        [Authorize]
+        public IActionResult ReserveBook([FromBody]TransactionRequest request)
+        {
+            _ctx.Reservations
+                .Add(new Reservation { BookID = request.BookID, UserID = request.UserID, datetime = DateTime.Now, Active = true});
+            _ctx.SaveChanges();
+            return Ok();
+        }
+
+        [Route("fill_reservation")]
+        [HttpPost]
+        [Authorize]
+        public IActionResult FillReservation([FromBody]TransactionRequest request)
+        {
+            _ctx.Reservations
+                .Where(r => r.Active && r.BookID.Equals(request.BookID) && r.UserID.Equals(request.UserID))
+                .OrderByDescending(r => r.datetime)
+                .First()
+                .Active = false;
+            _ctx.SaveChanges();
+            return Ok();
+        }
+
     }
 
 
@@ -164,26 +218,37 @@ namespace LibraryAppMVC.Controllers
             _ctx = context;
         }
 
+        [AllowAnonymous]
         [Route("books")]
-        public IActionResult GetABook(string title)
+        public IActionResult GetABook(string title, int page = 1)
         {
             List<Book> a;
-            if (title != null)
+            if (title != null)  // Title specified
             {
                 a = _ctx.Books
                     .Where(b => b.Title.Contains(title))
-                    //.Include(book => book.Cover)
+                    .Include(book => book.Cover)
                     .Include(book => book.AuthorBooks)
                         .ThenInclude(ab => ab.Author)
                     .ToList();
             }
-            else
+            else  // Title not specified
             {
+                if(page<1) { page = 1; }
+                int pos_i = (page-1) * 10;
+                int pos_f = page * 10;
+                int count = _ctx.Books.Count();
+                if(pos_f>count) { pos_f = count; }
+                if(pos_i>count) { a = new List<Book>(); }
+                else
+                {
                 a = _ctx.Books
-                    //.Include(book => book.Cover)
+                    .Include(book => book.Cover)
                     .Include(book => book.AuthorBooks)
                         .ThenInclude(ab => ab.Author)
-                    .ToList();
+                    .ToList()
+                    .GetRange(pos_i, (pos_f-pos_i));
+                }
             }
             return Json(a);
         }
@@ -199,21 +264,34 @@ namespace LibraryAppMVC.Controllers
             _ctx = context;
         }
 
-        [Route("authors")]
-        [Authorize]
+        [Route("authors")]  // Marked for removal, dummy data for testing at this point
         public IActionResult GetAnAuthor()
         {
             var a = _ctx.Authors
                 .ToList();
             return (Json(a));
         }
+        
 
-        [Route("authorbooks")]
-        public IActionResult GetAuthorBook()
+        [Route("adduser")]
+        public IActionResult AddUser([FromBody]User user)
         {
-            var a = _ctx.AuthorBook_rel
-                .ToList();
-            return (Json(a));
+            byte[] salt = new byte[128 / 8];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(salt);
+            }
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                    password: user.Password,
+                    salt: salt,
+                    prf: KeyDerivationPrf.HMACSHA1,
+                    iterationCount: 10000,
+                    numBytesRequested: 256 / 8));
+            user.Salt = Convert.ToBase64String(salt);
+            user.PasswordHash = hashed;
+            _ctx.Users.Add(user);
+            _ctx.SaveChanges();
+            return Ok();
         }
     }
 }

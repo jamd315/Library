@@ -11,9 +11,10 @@ using System;
 namespace DatabaseConnect.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20180211231914_schooldid-int-to-string")]
+    partial class schooldidinttostring
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -136,10 +137,6 @@ namespace DatabaseConnect.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("FullName");
-
-                    b.Property<string>("PasswordHash");
-
-                    b.Property<string>("Salt");
 
                     b.Property<string>("SchoolID");
 

@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Rewrite;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace LibraryAppMVC
 {
@@ -35,8 +37,10 @@ namespace LibraryAppMVC
                 .AddJwtBearer(opt =>
                 {
                     opt.Audience = "http://localhost:5001/";
-                    opt.Authority = "http://localhost:5000/";
+                    opt.Authority = "http://localhost/";
                     opt.RequireHttpsMetadata = false;  // TODO dev only
+                    opt.Configuration = new OpenIdConnectConfiguration();
+                    // <3 Stackexchange https://stackoverflow.com/questions/37693516/unable-to-obtain-configuration-from-well-known-openid-configuration/37973711
                     opt.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
@@ -50,9 +54,8 @@ namespace LibraryAppMVC
                 });
 
             services.AddSingleton(Configuration);
-            
-            var CnString = @"Server=tcp:lizardswimmer-dbserver.database.windows.net,1433;Initial Catalog=lizardswimmer-db;Persist Security Info=False;User ID=jamd315;Password=myDBPassword!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";  // TODO stop hardcoding passwords
-            services.AddDbContext<Context>(options => options.UseSqlServer(CnString));
+
+            services.AddDbContext<Context>(options => options.UseSqlServer(Configuration["ConnectionString"]));
             services.AddMvc()
                 .AddJsonOptions(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         }
@@ -70,8 +73,10 @@ namespace LibraryAppMVC
                 app.UseExceptionHandler("/Home/Error");
             }
             
-            app.UseStaticFiles();
+            //var options = new RewriteOptions().AddRedirectToHttps();
+            //app.UseRewriter(options);
             app.UseAuthentication();
+            app.UseStaticFiles();
 
             app.UseMvc(routes =>
             {

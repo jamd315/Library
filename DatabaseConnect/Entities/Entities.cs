@@ -60,7 +60,11 @@ namespace DatabaseConnect.Entities
         [Key]
         public int UserID { get; set; }
         public String FullName { get; set; }
-        public int SchoolID { get; set; }
+        public String SchoolID { get; set; }
+        public String PasswordHash { get; set; }
+        public String Salt { get; set; } // TODO should these be more restricted?
+        [NotMapped]
+        public String Password { get; set; }
     }
 
     [Table("tblUType")]
@@ -85,10 +89,25 @@ namespace DatabaseConnect.Entities
     [Table("tblCheckouts")]
     public class Checkout
     {
+        [Key]
+        public int ID { get; set; }
         public User User { get; set; }
         public int UserID { get; set; }
         public Book Book { get; set; }
         public int BookID { get; set; }
+        public Boolean Active { get; set; }
+    }
+
+    [Table("tblReservations")]
+    public class Reservation
+    {
+        [Key]
+        public int ID { get; set; }
+        public User User { get; set; }
+        public int UserID { get; set; }
+        public Book Book { get; set; }
+        public int BookID { get; set; }
+        public DateTime datetime { get; set; }
         public Boolean Active { get; set; }
     }
 }

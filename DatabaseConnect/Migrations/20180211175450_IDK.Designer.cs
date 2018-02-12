@@ -11,9 +11,10 @@ using System;
 namespace DatabaseConnect.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20180211175450_IDK")]
+    partial class IDK
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,20 +74,15 @@ namespace DatabaseConnect.Migrations
 
             modelBuilder.Entity("DatabaseConnect.Entities.Checkout", b =>
                 {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("Active");
+                    b.Property<int>("UserID");
 
                     b.Property<int>("BookID");
 
-                    b.Property<int>("UserID");
+                    b.Property<bool>("Active");
 
-                    b.HasKey("ID");
+                    b.HasKey("UserID", "BookID");
 
                     b.HasIndex("BookID");
-
-                    b.HasIndex("UserID");
 
                     b.ToTable("tblCheckouts");
                 });
@@ -108,28 +104,6 @@ namespace DatabaseConnect.Migrations
                     b.ToTable("tblCovers");
                 });
 
-            modelBuilder.Entity("DatabaseConnect.Entities.Reservation", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("Active");
-
-                    b.Property<int>("BookID");
-
-                    b.Property<int>("UserID");
-
-                    b.Property<DateTime>("datetime");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("BookID");
-
-                    b.HasIndex("UserID");
-
-                    b.ToTable("tblReservations");
-                });
-
             modelBuilder.Entity("DatabaseConnect.Entities.User", b =>
                 {
                     b.Property<int>("UserID")
@@ -137,11 +111,7 @@ namespace DatabaseConnect.Migrations
 
                     b.Property<string>("FullName");
 
-                    b.Property<string>("PasswordHash");
-
-                    b.Property<string>("Salt");
-
-                    b.Property<string>("SchoolID");
+                    b.Property<int>("SchoolID");
 
                     b.HasKey("UserID");
 
@@ -215,19 +185,6 @@ namespace DatabaseConnect.Migrations
                     b.HasOne("DatabaseConnect.Entities.Book", "Book")
                         .WithOne("Cover")
                         .HasForeignKey("DatabaseConnect.Entities.Cover", "BookID")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("DatabaseConnect.Entities.Reservation", b =>
-                {
-                    b.HasOne("DatabaseConnect.Entities.Book", "Book")
-                        .WithMany()
-                        .HasForeignKey("BookID")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("DatabaseConnect.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
