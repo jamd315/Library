@@ -46,22 +46,25 @@ namespace LibraryAppMVC.Controllers
 
             if(user!=null)
             {
-                var tokenString = BuildToken(user);
-                response = Ok(new { token = tokenString });
+                response = BuildToken(user);
             }
             return response;
         }
 
-        private String BuildToken(UserModel user)
+        private IActionResult BuildToken(UserModel user)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
                 _config["Jwt:Issuer"],
-                expires: DateTime.Now.AddMinutes(30),
+                expires: DateTime.Now.AddSeconds(30),  // TODO maybe from cfg
                 signingCredentials: creds);
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return Ok(
+                new {
+                    token = new JwtSecurityTokenHandler().WriteToken(token),
+                    expiration = token.ValidTo
+                });
         }
 
         private UserModel Authenticate(LoginModel login)
@@ -73,11 +76,10 @@ namespace LibraryAppMVC.Controllers
                 User =_ctx.Users
                     .Where(u => u.SchoolID.Equals(login.Username))
                     .First();
-                
             }
             catch
             {
-                return null;
+                return null;  // No user found with specified school ID
             }
             if(VerifyPass(login.Password, User.Salt, User.PasswordHash))
             {
@@ -264,6 +266,7 @@ namespace LibraryAppMVC.Controllers
             _ctx = context;
         }
 
+        [Authorize]
         [Route("authors")]  // Marked for removal, dummy data for testing at this point
         public IActionResult GetAnAuthor()
         {
