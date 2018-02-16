@@ -80,6 +80,12 @@ namespace DatabaseConnect.Migrations
 
                     b.Property<int>("BookID");
 
+                    b.Property<DateTime>("CheckoutDate");
+
+                    b.Property<DateTime>("DueDate");
+
+                    b.Property<int>("Renewals");
+
                     b.Property<int>("UserID");
 
                     b.HasKey("ID");
@@ -117,9 +123,9 @@ namespace DatabaseConnect.Migrations
 
                     b.Property<int>("BookID");
 
-                    b.Property<int>("UserID");
+                    b.Property<DateTime>("Datetime");
 
-                    b.Property<DateTime>("datetime");
+                    b.Property<int>("UserID");
 
                     b.HasKey("ID");
 

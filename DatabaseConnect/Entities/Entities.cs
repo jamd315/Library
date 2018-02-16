@@ -96,6 +96,9 @@ namespace DatabaseConnect.Entities
         public Book Book { get; set; }
         public int BookID { get; set; }
         public Boolean Active { get; set; }
+        public DateTime CheckoutDate { get; set; }
+        public DateTime DueDate { get; set; }
+        public int Renewals { get; set; }
     }
 
     [Table("tblReservations")]
@@ -107,7 +110,7 @@ namespace DatabaseConnect.Entities
         public int UserID { get; set; }
         public Book Book { get; set; }
         public int BookID { get; set; }
-        public DateTime datetime { get; set; }
+        public DateTime Datetime { get; set; }
         public Boolean Active { get; set; }
     }
 }

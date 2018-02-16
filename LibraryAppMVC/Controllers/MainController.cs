@@ -58,7 +58,7 @@ namespace LibraryAppMVC.Controllers
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
                 _config["Jwt:Issuer"],
-                expires: DateTime.Now.AddSeconds(30),  // TODO maybe from cfg
+                expires: DateTime.Now.AddMinutes(Convert.ToDouble(_config["LoginDurationMinutes"])),
                 signingCredentials: creds);
             return Ok(
                 new {
@@ -164,7 +164,7 @@ namespace LibraryAppMVC.Controllers
 
 
             _ctx.Checkouts
-                .Add(new Checkout { BookID = request.BookID, UserID = request.UserID, Active=true });
+                .Add(new Checkout { BookID = request.BookID, UserID = request.UserID, Active=true, CheckoutDate=DateTime.Now, DueDate=DateTime.Now.AddDays(14) });
             _ctx.SaveChanges();
             return Ok();
         }
@@ -188,7 +188,7 @@ namespace LibraryAppMVC.Controllers
         public IActionResult ReserveBook([FromBody]TransactionRequest request)
         {
             _ctx.Reservations
-                .Add(new Reservation { BookID = request.BookID, UserID = request.UserID, datetime = DateTime.Now, Active = true});
+                .Add(new Reservation { BookID = request.BookID, UserID = request.UserID, Datetime = DateTime.Now, Active = true});
             _ctx.SaveChanges();
             return Ok();
         }
@@ -200,13 +200,48 @@ namespace LibraryAppMVC.Controllers
         {
             _ctx.Reservations
                 .Where(r => r.Active && r.BookID.Equals(request.BookID) && r.UserID.Equals(request.UserID))
-                .OrderByDescending(r => r.datetime)
+                .OrderByDescending(r => r.Datetime)
                 .First()
                 .Active = false;
             _ctx.SaveChanges();
             return Ok();
         }
 
+        [Route("renew")]
+        [HttpPost]
+        [Authorize]
+        public IActionResult RenewBook([FromBody]TransactionRequest request)
+        {
+            bool AlreadyReserved = _ctx.Reservations
+                .Where(r => r.Active && r.BookID.Equals(request.BookID))
+                .Count() > 0;
+            bool OverRenewals = _ctx.Checkouts
+                .Where(c => c.Active && c.BookID.Equals(request.BookID) && c.UserID.Equals(request.UserID))
+                .OrderByDescending(c => c.CheckoutDate)
+                .First()
+                .Renewals > 2;
+            if(AlreadyReserved || OverRenewals)
+            {
+                return Forbid();
+            }
+            DateTime Checkout = _ctx.Checkouts
+                .Where(c => c.Active && c.BookID.Equals(request.BookID) && c.UserID.Equals(request.UserID))
+                .OrderByDescending(c => c.CheckoutDate)
+                .First()
+                .CheckoutDate;
+            _ctx.Checkouts
+                .Where(c => c.Active && c.BookID.Equals(request.BookID) && c.UserID.Equals(request.UserID))
+                .OrderByDescending(c => c.CheckoutDate)
+                .First()
+                .CheckoutDate = Checkout.AddDays(7);
+            _ctx.Checkouts
+                .Where(c => c.Active && c.BookID.Equals(request.BookID) && c.UserID.Equals(request.UserID))
+                .OrderByDescending(c => c.CheckoutDate)
+                .First()
+                .Renewals += 1;
+            _ctx.SaveChanges();
+            return Ok();
+        }
     }
 
 
