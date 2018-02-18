@@ -37,7 +37,7 @@ namespace LibraryAppMVC
                 .AddJwtBearer(opt =>
                 {
                     opt.Audience = "http://localhost:5001/";
-                    opt.Authority = "http://localhost/";
+                    opt.Authority = "http://localhost:5000/";
                     opt.RequireHttpsMetadata = false;  // TODO dev only
                     opt.Configuration = new OpenIdConnectConfiguration();
                     // <3 Stackexchange https://stackoverflow.com/questions/37693516/unable-to-obtain-configuration-from-well-known-openid-configuration/37973711

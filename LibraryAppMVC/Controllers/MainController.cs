@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
@@ -55,11 +56,19 @@ namespace LibraryAppMVC.Controllers
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.StudentID),
+                new Claim(JwtRegisteredClaimNames.Jti, user.TokenVersion.ToString())
+            };
 
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
+            var token = new JwtSecurityToken(
+                _config["Jwt:Issuer"],
                 _config["Jwt:Issuer"],
                 expires: DateTime.Now.AddMinutes(Convert.ToDouble(_config["LoginDurationMinutes"])),
-                signingCredentials: creds);
+                signingCredentials: creds,
+                claims: claims
+                );
             return Ok(
                 new {
                     token = new JwtSecurityTokenHandler().WriteToken(token),
@@ -83,7 +92,7 @@ namespace LibraryAppMVC.Controllers
             }
             if(VerifyPass(login.Password, User.Salt, User.PasswordHash))
             {
-                usermodel = new UserModel { Name = User.FullName };
+                usermodel = new UserModel { Name = User.FullName, StudentID = User.SchoolID, TokenVersion = User.TokenVersion };
             }
             return usermodel;
         }
@@ -109,10 +118,14 @@ namespace LibraryAppMVC.Controllers
         public class UserModel  // Maybe get user from entities instead
         {
             public String Name { get; set; }
+            public String StudentID { get; set; }
+            public int TokenVersion { get; set; }
         }
 
 
     }
+
+
 
 
     [Route("/library/")]
@@ -128,7 +141,6 @@ namespace LibraryAppMVC.Controllers
         public class TransactionRequest
         {
             public int BookID { get; set; }
-            public int UserID { get; set; }
         }
 
         [Route("checkout")]
@@ -136,8 +148,14 @@ namespace LibraryAppMVC.Controllers
         [Authorize]
         public IActionResult BookCheckout([FromBody]TransactionRequest request)
         {
+            string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            int userID = _ctx.Users
+                .Where(u => u.SchoolID == schoolID)
+                .First()
+                .UserID;
+
             int limit = _ctx.UserUType_rel // Get max checked out books for usertype
-                .Where(ut => ut.UserID == request.UserID)
+                .Where(ut => ut.UserID == userID)
                 .Include(ut => ut.UType)
                 .First()
                 .UType
@@ -145,7 +163,7 @@ namespace LibraryAppMVC.Controllers
 
             int current = _ctx.Checkouts // Get current user checked out books
                 .Where(c => c.Active)
-                .Where(c => c.UserID == request.UserID)
+                .Where(c => c.UserID == userID)
                 .Count();
 
             if (current >= limit)  // Check to see if user can checkout more books
@@ -164,7 +182,7 @@ namespace LibraryAppMVC.Controllers
 
 
             _ctx.Checkouts
-                .Add(new Checkout { BookID = request.BookID, UserID = request.UserID, Active=true, CheckoutDate=DateTime.Now, DueDate=DateTime.Now.AddDays(14) });
+                .Add(new Checkout { BookID = request.BookID, UserID = userID, Active=true, CheckoutDate=DateTime.Now, DueDate=DateTime.Now.AddDays(14) });
             _ctx.SaveChanges();
             return Ok();
         }
@@ -174,8 +192,14 @@ namespace LibraryAppMVC.Controllers
         [Authorize]
         public IActionResult BookCheckin([FromBody]TransactionRequest request)
         {
+            string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            int userID = _ctx.Users
+                .Where(u => u.SchoolID == schoolID)
+                .First()
+                .UserID;
+
             _ctx.Checkouts
-                .Where(c => c.BookID == request.BookID && c.UserID == request.UserID)
+                .Where(c => c.BookID == request.BookID && c.UserID == userID)
                 .Last()
                 .Active = false;
             _ctx.SaveChanges();
@@ -187,8 +211,14 @@ namespace LibraryAppMVC.Controllers
         [Authorize]
         public IActionResult ReserveBook([FromBody]TransactionRequest request)
         {
+            string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            int userID = _ctx.Users
+                .Where(u => u.SchoolID == schoolID)
+                .First()
+                .UserID;
+
             _ctx.Reservations
-                .Add(new Reservation { BookID = request.BookID, UserID = request.UserID, Datetime = DateTime.Now, Active = true});
+                .Add(new Reservation { BookID = request.BookID, UserID = userID, Datetime = DateTime.Now, Active = true});
             _ctx.SaveChanges();
             return Ok();
         }
@@ -198,8 +228,14 @@ namespace LibraryAppMVC.Controllers
         [Authorize]
         public IActionResult FillReservation([FromBody]TransactionRequest request)
         {
+            string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            int userID = _ctx.Users
+                .Where(u => u.SchoolID == schoolID)
+                .First()
+                .UserID; 
+
             _ctx.Reservations
-                .Where(r => r.Active && r.BookID.Equals(request.BookID) && r.UserID.Equals(request.UserID))
+                .Where(r => r.Active && r.BookID.Equals(request.BookID) && r.UserID.Equals(userID))
                 .OrderByDescending(r => r.Datetime)
                 .First()
                 .Active = false;
@@ -212,11 +248,17 @@ namespace LibraryAppMVC.Controllers
         [Authorize]
         public IActionResult RenewBook([FromBody]TransactionRequest request)
         {
+            string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            int userID = _ctx.Users
+                .Where(u => u.SchoolID == schoolID)
+                .First()
+                .UserID;
+
             bool AlreadyReserved = _ctx.Reservations
                 .Where(r => r.Active && r.BookID.Equals(request.BookID))
                 .Count() > 0;
             bool OverRenewals = _ctx.Checkouts
-                .Where(c => c.Active && c.BookID.Equals(request.BookID) && c.UserID.Equals(request.UserID))
+                .Where(c => c.Active && c.BookID.Equals(request.BookID) && c.UserID.Equals(userID))
                 .OrderByDescending(c => c.CheckoutDate)
                 .First()
                 .Renewals > 2;
@@ -225,17 +267,17 @@ namespace LibraryAppMVC.Controllers
                 return Forbid();
             }
             DateTime Checkout = _ctx.Checkouts
-                .Where(c => c.Active && c.BookID.Equals(request.BookID) && c.UserID.Equals(request.UserID))
+                .Where(c => c.Active && c.BookID.Equals(request.BookID) && c.UserID.Equals(userID))
                 .OrderByDescending(c => c.CheckoutDate)
                 .First()
                 .CheckoutDate;
             _ctx.Checkouts
-                .Where(c => c.Active && c.BookID.Equals(request.BookID) && c.UserID.Equals(request.UserID))
+                .Where(c => c.Active && c.BookID.Equals(request.BookID) && c.UserID.Equals(userID))
                 .OrderByDescending(c => c.CheckoutDate)
                 .First()
                 .CheckoutDate = Checkout.AddDays(7);
             _ctx.Checkouts
-                .Where(c => c.Active && c.BookID.Equals(request.BookID) && c.UserID.Equals(request.UserID))
+                .Where(c => c.Active && c.BookID.Equals(request.BookID) && c.UserID.Equals(userID))
                 .OrderByDescending(c => c.CheckoutDate)
                 .First()
                 .Renewals += 1;
@@ -243,6 +285,8 @@ namespace LibraryAppMVC.Controllers
             return Ok();
         }
     }
+
+
 
 
     [Route("/simple/")]
@@ -280,7 +324,7 @@ namespace LibraryAppMVC.Controllers
                 else
                 {
                 a = _ctx.Books
-                    .Include(book => book.Cover)
+                    //.Include(book => book.Cover)  // Don't need images for list anymore
                     .Include(book => book.AuthorBooks)
                         .ThenInclude(ab => ab.Author)
                     .ToList()
@@ -289,7 +333,17 @@ namespace LibraryAppMVC.Controllers
             }
             return Json(a);
         }
+
+        [Authorize]
+        [Route("user")]
+        public IActionResult GetUserInfo()
+        {
+            string userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            return Ok(userId);
+        }
     }
+
+
 
 
     [Route("/dev/")]

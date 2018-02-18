@@ -65,6 +65,7 @@ namespace DatabaseConnect.Entities
         public String Salt { get; set; } // TODO should these be more restricted?
         [NotMapped]
         public String Password { get; set; }
+        public int TokenVersion { get; set; }
     }
 
     [Table("tblUType")]
