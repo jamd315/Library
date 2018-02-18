@@ -23,7 +23,7 @@ using System.Web;
 
 namespace LibraryAppMVC.Controllers
 {
-    [Route("/login")]
+    [Route("/user/")]
     public class LoginController : Controller
     {
         private IConfiguration _config;
@@ -37,7 +37,7 @@ namespace LibraryAppMVC.Controllers
             _logger = logger;
         }
 
-
+        [Route("login")]
         [AllowAnonymous]
         [HttpPost]
         public IActionResult CreateToken([FromBody]LoginModel login)
@@ -50,6 +50,24 @@ namespace LibraryAppMVC.Controllers
                 response = BuildToken(user);
             }
             return response;
+        }
+
+        [Route("logout")]
+        [Authorize]
+        [HttpPost]
+        public IActionResult Logout()
+        {
+            string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            int userID = _ctx.Users
+                .Where(u => u.SchoolID == schoolID)
+                .First()
+                .UserID;
+            _ctx.Users
+                .Where(u => u.UserID == userID)
+                .First()
+                .TokenVersion += 1;
+            _ctx.SaveChanges();
+            return Ok();
         }
 
         private IActionResult BuildToken(UserModel user)
@@ -356,12 +374,10 @@ namespace LibraryAppMVC.Controllers
         }
 
         [Authorize]
-        [Route("authors")]  // Marked for removal, dummy data for testing at this point
-        public IActionResult GetAnAuthor()
+        [Route("tokentest")]
+        public IActionResult TestToken()
         {
-            var a = _ctx.Authors
-                .ToList();
-            return (Json(a));
+            return Ok();
         }
         
 
