@@ -70,6 +70,23 @@ namespace LibraryAppMVC.Controllers
             return Ok();
         }
 
+        [Route("info")]
+        [Authorize]
+        [HttpPost]
+        public IActionResult UserInfo()
+        {
+            string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            int userID = _ctx.Users
+                .Where(u => u.SchoolID == schoolID)
+                .First()
+                .UserID;
+            var resp = _ctx.Checkouts
+                .Where(c => c.Active)
+                .Where(c => c.UserID == userID)
+                .ToList();
+            return Json(resp);  // TODO
+        }
+
         private IActionResult BuildToken(UserModel user)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
@@ -133,7 +150,7 @@ namespace LibraryAppMVC.Controllers
             public String Password { get; set; }
         }
 
-        public class UserModel  // Maybe get user from entities instead
+        public class UserModel  // Maybe get user from entities instead? TODO
         {
             public String Name { get; set; }
             public String StudentID { get; set; }

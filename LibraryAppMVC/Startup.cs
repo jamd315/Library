@@ -28,7 +28,8 @@ namespace LibraryAppMVC
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            /* https://auth0.com/blog/securing-asp-dot-net-core-2-applications-with-jwts/
+            /* JWT Resources
+             * https://auth0.com/blog/securing-asp-dot-net-core-2-applications-with-jwts/
              * https://blogs.msdn.microsoft.com/webdev/2017/04/06/jwt-validation-and-authorization-in-asp-net-core/
              * https://docs.microsoft.com/en-us/aspnet/core/migration/1x-to-2x/identity-2x
              * https://fullstackmark.com/post/13/jwt-authentication-with-aspnet-core-2-web-api-angular-5-net-core-identity-and-facebook-login
@@ -39,7 +40,7 @@ namespace LibraryAppMVC
                     opt.Audience = "http://localhost:5001/";
                     opt.Authority = "http://localhost:5000/";
                     opt.Configuration = new OpenIdConnectConfiguration();
-                    // <3 Stackexchange https://stackoverflow.com/questions/37693516/unable-to-obtain-configuration-from-well-known-openid-configuration/37973711
+                    // Stackexchange https://stackoverflow.com/questions/37693516/unable-to-obtain-configuration-from-well-known-openid-configuration/37973711
                     opt.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
@@ -73,8 +74,11 @@ namespace LibraryAppMVC
                 app.UseExceptionHandler("/Home/Error");
             }
             
+            // HTTPS redirector
+            /*
             var options = new RewriteOptions().AddRedirectToHttps();
             app.UseRewriter(options);
+            */
             app.UseAuthentication();
             app.UseStaticFiles();
 
