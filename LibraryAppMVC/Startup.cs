@@ -38,7 +38,6 @@ namespace LibraryAppMVC
                 {
                     opt.Audience = "http://localhost:5001/";
                     opt.Authority = "http://localhost:5000/";
-                    opt.RequireHttpsMetadata = false;  // TODO dev only
                     opt.Configuration = new OpenIdConnectConfiguration();
                     // <3 Stackexchange https://stackoverflow.com/questions/37693516/unable-to-obtain-configuration-from-well-known-openid-configuration/37973711
                     opt.TokenValidationParameters = new TokenValidationParameters
@@ -74,8 +73,8 @@ namespace LibraryAppMVC
                 app.UseExceptionHandler("/Home/Error");
             }
             
-            //var options = new RewriteOptions().AddRedirectToHttps();
-            //app.UseRewriter(options);
+            var options = new RewriteOptions().AddRedirectToHttps();
+            app.UseRewriter(options);
             app.UseAuthentication();
             app.UseStaticFiles();
 
