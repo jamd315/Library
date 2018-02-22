@@ -360,7 +360,7 @@ namespace LibraryAppMVC.Controllers
                 else
                 {
                 a = _ctx.Books
-                    //.Include(book => book.Cover)  // Don't need images for list anymore
+                    .Include(book => book.Cover)
                     .Include(book => book.AuthorBooks)
                         .ThenInclude(ab => ab.Author)
                     .ToList()
