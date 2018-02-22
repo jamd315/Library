@@ -25,13 +25,9 @@ namespace DatabaseConnect.Migrations
                     b.Property<int>("AuthorID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("BookID");
-
                     b.Property<string>("Name");
 
                     b.HasKey("AuthorID");
-
-                    b.HasIndex("BookID");
 
                     b.ToTable("tblAuthor");
                 });
@@ -61,8 +57,6 @@ namespace DatabaseConnect.Migrations
                     b.Property<string>("ISBN");
 
                     b.Property<int>("PageCount");
-
-                    b.Property<string>("SpecialCollection");
 
                     b.Property<string>("Title");
 
@@ -183,13 +177,6 @@ namespace DatabaseConnect.Migrations
                     b.HasKey("UTypeID");
 
                     b.ToTable("tblUType");
-                });
-
-            modelBuilder.Entity("DatabaseConnect.Entities.Author", b =>
-                {
-                    b.HasOne("DatabaseConnect.Entities.Book")
-                        .WithMany("Authors")
-                        .HasForeignKey("BookID");
                 });
 
             modelBuilder.Entity("DatabaseConnect.Entities.AuthorBook", b =>

@@ -366,6 +366,22 @@ namespace LibraryAppMVC.Controllers
                     .GetRange(pos_i, (pos_f-pos_i));
                 }
             }
+
+            for (int i = 0; i < a.Count(); i++)  // This weird bit of code should probably not be changed, it caused a really hard, no error crash on the server, but it (probably) works now
+            {
+                Book b = a.ElementAt(i);
+                List<String> AuthorList = new List<String>();
+                foreach(AuthorBook ab in b.AuthorBooks)
+                {
+                    String Author = ab.Author.Name;
+                    if(Author.Length>0)
+                    {
+                        AuthorList.Add(Author);
+                    }
+                }
+                b.Authors = AuthorList;
+                //a.Insert(i, b);  // This literally kills everything for some reason, but the code works without it
+            }
             return Json(a);
         }
 
@@ -390,11 +406,12 @@ namespace LibraryAppMVC.Controllers
             _ctx = context;
         }
 
-        [Authorize]
+        
         [Route("tokentest")]
         public IActionResult TestToken()
         {
-            return Ok();
+            var a = new List<String>() { "aaa", "bbb", "ccc" };
+            return Json(a);
         }
         
 
