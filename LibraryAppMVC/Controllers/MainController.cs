@@ -80,11 +80,16 @@ namespace LibraryAppMVC.Controllers
                 .Where(u => u.SchoolID == schoolID)
                 .First()
                 .UserID;
-            var resp = _ctx.Checkouts
+            var checkouts = _ctx.Checkouts
                 .Where(c => c.Active)
                 .Where(c => c.UserID == userID)
                 .ToList();
-            return Json(resp);  // TODO
+            var reservations = _ctx.Reservations
+                .Where(r => r.Active)
+                .Where(r => r.UserID == userID)
+                .ToList();
+            var resp = new { checkouts, reservations };
+            return Json(resp);
         }
 
         private IActionResult BuildToken(UserModel user)
@@ -159,8 +164,6 @@ namespace LibraryAppMVC.Controllers
 
 
     }
-
-
 
 
     [Route("/library/")]
@@ -322,8 +325,6 @@ namespace LibraryAppMVC.Controllers
     }
 
 
-
-
     [Route("/simple/")]
     public class MainController : Controller
     {
@@ -393,8 +394,6 @@ namespace LibraryAppMVC.Controllers
             return Ok(userId);
         }
     }
-
-
 
 
     [Route("/dev/")]

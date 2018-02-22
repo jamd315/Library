@@ -27,12 +27,12 @@ namespace DatabaseConnect.Entities
         public string Title { get; set; }
         public int PageCount { get; set; }
         public Cover Cover { get; set; }
-        public String ISBN { get; set; }
-        public String DeweyDecimal { get; set; }
-        public String FicID { get; set; }
         public IEnumerable<AuthorBook> AuthorBooks { get; set; }
         [NotMapped]
         public IList<String> Authors { get; set; }
+        public String ISBN { get; set; }
+        public String DeweyDecimal { get; set; }
+        public String FicID { get; set; }
     }
 
     [Table("tblAuthorBook")]

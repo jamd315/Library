@@ -71,14 +71,12 @@ namespace LibraryAppMVC
             }
             else
             {
+                // HTTPS redirector
                 app.UseExceptionHandler("/Home/Error");
+                var options = new RewriteOptions().AddRedirectToHttps();
+                app.UseRewriter(options);
             }
-            
-            // HTTPS redirector
-            /*
-            var options = new RewriteOptions().AddRedirectToHttps();
-            app.UseRewriter(options);
-            */
+
             app.UseAuthentication();
             app.UseStaticFiles();
 
