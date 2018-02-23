@@ -11,8 +11,8 @@ using System;
 namespace DatabaseConnect.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20180221232116_refactor-test")]
-    partial class refactortest
+    [Migration("20180223192139_database-fixed-maybe")]
+    partial class databasefixedmaybe
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -37,7 +37,9 @@ namespace DatabaseConnect.Migrations
                 {
                     b.Property<int>("BookID");
 
-                    b.Property<int>("AuthorID");
+                    b.Property<int>("AuthorID")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue(3);
 
                     b.HasKey("BookID", "AuthorID");
 
@@ -51,9 +53,15 @@ namespace DatabaseConnect.Migrations
                     b.Property<int>("BookID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("DeweyDecimal");
+                    b.Property<int>("CoverID");
 
-                    b.Property<string>("FicID");
+                    b.Property<string>("DeweyDecimal")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue("n/a");
+
+                    b.Property<string>("FicID")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue("n/a");
 
                     b.Property<string>("ISBN");
 
@@ -62,6 +70,8 @@ namespace DatabaseConnect.Migrations
                     b.Property<string>("Title");
 
                     b.HasKey("BookID");
+
+                    b.HasIndex("CoverID");
 
                     b.ToTable("tblBook");
                 });
@@ -102,9 +112,6 @@ namespace DatabaseConnect.Migrations
                     b.Property<int>("BookID");
 
                     b.HasKey("CoverID");
-
-                    b.HasIndex("BookID")
-                        .IsUnique();
 
                     b.ToTable("tblCovers");
                 });
@@ -193,6 +200,14 @@ namespace DatabaseConnect.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("DatabaseConnect.Entities.Book", b =>
+                {
+                    b.HasOne("DatabaseConnect.Entities.Cover", "Cover")
+                        .WithMany("Books")
+                        .HasForeignKey("CoverID")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("DatabaseConnect.Entities.Checkout", b =>
                 {
                     b.HasOne("DatabaseConnect.Entities.Book", "Book")
@@ -203,14 +218,6 @@ namespace DatabaseConnect.Migrations
                     b.HasOne("DatabaseConnect.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("DatabaseConnect.Entities.Cover", b =>
-                {
-                    b.HasOne("DatabaseConnect.Entities.Book", "Book")
-                        .WithOne("Cover")
-                        .HasForeignKey("DatabaseConnect.Entities.Cover", "BookID")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

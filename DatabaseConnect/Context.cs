@@ -44,6 +44,23 @@ namespace DatabaseConnect
 
             modelBuilder.Entity<UserUType>()  // Composite Key
                 .HasKey(ut => new { ut.UserID, ut.UTypeID });
+
+            modelBuilder.Entity<Book>()
+                .Property(a => a.DeweyDecimal)
+                .HasDefaultValue("n/a");
+
+            modelBuilder.Entity<Book>()
+                .Property(a => a.FicID)
+                .HasDefaultValue("n/a");
+
+            modelBuilder.Entity<Book>()
+                .Property(a => a.DeweyDecimal)
+                .HasDefaultValue("n/a");
+
+            modelBuilder.Entity<AuthorBook>()
+                .Property(ab => ab.AuthorID)
+                .HasDefaultValue(3);
+
         }
     }
 }

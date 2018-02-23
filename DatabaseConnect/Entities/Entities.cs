@@ -33,6 +33,7 @@ namespace DatabaseConnect.Entities
         public String ISBN { get; set; }
         public String DeweyDecimal { get; set; }
         public String FicID { get; set; }
+        public int CoverID { get; set; }  // Order matters
     }
 
     [Table("tblAuthorBook")]
@@ -50,7 +51,7 @@ namespace DatabaseConnect.Entities
         [Key]
         public int CoverID { get; set; }
         public int BookID { get; set; }
-        public Book Book { get; set; }
+        public List<Book> Books { get; set; }
         public String Base64Encoded { get; set; }
     }
 
