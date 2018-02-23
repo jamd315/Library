@@ -88,6 +88,14 @@ namespace LibraryAppMVC.Controllers
                 .Where(r => r.Active)
                 .Where(r => r.UserID == userID)
                 .ToList();
+            foreach(Checkout c in checkouts)
+            {
+                c.User = null;
+            }
+            foreach(Reservation r in reservations)
+            {
+                r.User = null;
+            }
             var resp = new { checkouts, reservations };
             return Json(resp);
         }
@@ -155,7 +163,7 @@ namespace LibraryAppMVC.Controllers
             public String Password { get; set; }
         }
 
-        public class UserModel  // Maybe get user from entities instead? TODO
+        public class UserModel
         {
             public String Name { get; set; }
             public String StudentID { get; set; }
