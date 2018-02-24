@@ -40,7 +40,7 @@ namespace LibraryAppMVC.Controllers
         [Route("login")]
         [AllowAnonymous]
         [HttpPost]
-        public IActionResult CreateToken([FromBody]LoginModel login)
+        public IActionResult CreateToken([FromBody]LoginModel login) // Checked 2/24/18 working
         {
             IActionResult response = Unauthorized();
             var user = Authenticate(login);
@@ -55,7 +55,7 @@ namespace LibraryAppMVC.Controllers
         [Route("logout")]
         [Authorize]
         [HttpPost]
-        public IActionResult Logout()
+        public IActionResult Logout() // Checked 2/24/18 NOT working TODO
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             int userID = _ctx.Users
@@ -72,7 +72,7 @@ namespace LibraryAppMVC.Controllers
 
         [Route("info")]
         [Authorize]
-        [HttpPost]
+        [HttpGet]
         public IActionResult UserInfo()
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -192,7 +192,7 @@ namespace LibraryAppMVC.Controllers
         [Route("checkout")]
         [HttpPost]
         [Authorize]
-        public IActionResult BookCheckout([FromBody]TransactionRequest request)
+        public IActionResult BookCheckout([FromBody]TransactionRequest request) // Checked 2/24/18 working
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             int userID = _ctx.Users
@@ -214,7 +214,7 @@ namespace LibraryAppMVC.Controllers
 
             if (current >= limit)  // Check to see if user can checkout more books
             {
-                return Forbid($"You already have checked out {current} books, as many as you can.");
+                return StatusCode(409, $"You already have checked out {current} books, as many as you can.");
             }
 
             bool CheckedOut = _ctx.Checkouts
@@ -223,9 +223,8 @@ namespace LibraryAppMVC.Controllers
 
             if (CheckedOut)
             {
-                return Forbid("Already checked out");
+                return StatusCode(409, "Already checked out");
             }
-
 
             _ctx.Checkouts
                 .Add(new Checkout { BookID = request.BookID, UserID = userID, Active=true, CheckoutDate=DateTime.Now, DueDate=DateTime.Now.AddDays(14) });
@@ -236,7 +235,7 @@ namespace LibraryAppMVC.Controllers
         [Route("checkin")]
         [HttpPost]
         [Authorize]
-        public IActionResult BookCheckin([FromBody]TransactionRequest request)
+        public IActionResult BookCheckin([FromBody]TransactionRequest request) // Checked 2/24/18 working
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             int userID = _ctx.Users
@@ -263,10 +262,33 @@ namespace LibraryAppMVC.Controllers
                 .First()
                 .UserID;
 
-            _ctx.Reservations
-                .Add(new Reservation { BookID = request.BookID, UserID = userID, Datetime = DateTime.Now, Active = true});
-            _ctx.SaveChanges();
-            return Ok();
+            Boolean BookAvailable = _ctx.Checkouts
+                .Where(c => c.BookID == request.BookID && c.Active)
+                .Count() > 0;
+
+            BookAvailable = true;
+
+            Boolean UserAlreadyReserved = _ctx.Reservations
+                .Where(r => r.Active && r.UserID == userID)
+                .Count() > 0;
+
+            if(!UserAlreadyReserved || !BookAvailable)
+            {
+                _ctx.Reservations
+                    .Add(new Reservation { BookID = request.BookID, UserID = userID, Datetime = DateTime.Now, Active = true});
+                _ctx.SaveChanges();
+                return Ok();
+            }
+            else if(UserAlreadyReserved)
+            {
+                return StatusCode(409, "You have already reserved this book");
+            }
+            else if(BookAvailable)
+            {
+                return StatusCode(409, "This book can be checked out now, not reserved");
+            }
+            return StatusCode(500);
+
         }
 
         [Route("fill_reservation")]
@@ -278,15 +300,28 @@ namespace LibraryAppMVC.Controllers
             int userID = _ctx.Users
                 .Where(u => u.SchoolID == schoolID)
                 .First()
-                .UserID; 
+                .UserID;
 
-            _ctx.Reservations
-                .Where(r => r.Active && r.BookID.Equals(request.BookID) && r.UserID.Equals(userID))
-                .OrderByDescending(r => r.Datetime)
+            Boolean CheckedOut = _ctx.Checkouts
+                .Where(c => c.BookID == request.BookID)
                 .First()
-                .Active = false;
-            _ctx.SaveChanges();
-            return Ok();
+                .Active == true;
+
+            if(!CheckedOut)
+            {
+                IActionResult resp = BookCheckout(request);
+                _ctx.Reservations
+                    .Where(r => r.Active && r.BookID.Equals(request.BookID) && r.UserID.Equals(userID))
+                    .OrderByDescending(r => r.Datetime)
+                    .First()
+                    .Active = false;
+                _ctx.SaveChanges();
+                return resp;
+            }
+            else
+            {
+                return StatusCode(409, "Book already checked out");
+            }
         }
 
         [Route("renew")]
@@ -415,6 +450,7 @@ namespace LibraryAppMVC.Controllers
 
         
         [Route("tokentest")]
+        [Authorize]
         public IActionResult TestToken()
         {
             var a = new List<String>() { "aaa", "bbb", "ccc" };
@@ -439,6 +475,12 @@ namespace LibraryAppMVC.Controllers
             user.Salt = Convert.ToBase64String(salt);
             user.PasswordHash = hashed;
             _ctx.Users.Add(user);
+            int UserID = _ctx.Users
+                .Where(u => u.SchoolID == user.SchoolID)
+                .First()
+                .UserID;
+            _ctx.UserUType_rel
+                .Add(new UserUType { UserID = UserID, UTypeID = 1 });
             _ctx.SaveChanges();
             return Ok();
         }
