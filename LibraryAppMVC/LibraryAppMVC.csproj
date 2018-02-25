@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <ApplicationInsightsResourceId>/subscriptions/33209090-52a3-493b-86cc-e777ca742682/resourcegroups/lizardswimmer_central/providers/microsoft.insights/components/lizardswimmer_insights</ApplicationInsightsResourceId>
-    <ApplicationInsightsAnnotationResourceId>/subscriptions/33209090-52a3-493b-86cc-e777ca742682/resourceGroups/lizardswimmer_central/providers/microsoft.insights/components/lizardswimmer_insights</ApplicationInsightsAnnotationResourceId>
+    <ApplicationInsightsAnnotationResourceId>/subscriptions/33209090-52a3-493b-86cc-e777ca742682/resourcegroups/lizardswimmer_central/providers/microsoft.insights/components/lizardswimmer_insights</ApplicationInsightsAnnotationResourceId>
   </PropertyGroup>
 
   <ItemGroup>

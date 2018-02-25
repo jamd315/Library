@@ -418,10 +418,21 @@ namespace LibraryAppMVC.Controllers
                 }
             }
 
+            List<String> AuthorList = new List<String>();
+            foreach(Book b in a) 
+            {
+                b.Cover.Books = null;
+                foreach(AuthorBook ab in b.AuthorBooks)
+                {
+                    AuthorList.Add(ab.Author.Name);
+                }
+                b.Authors = AuthorList;
+                b.AuthorBooks = null;
+            }
+            /*
             for (int i = 0; i < a.Count(); i++)  // This weird bit of code should probably not be changed, it caused a really hard, no error crash on the server, but it (probably) works now
             {
                 Book b = a.ElementAt(i);
-                List<String> AuthorList = new List<String>();
                 foreach (AuthorBook ab in b.AuthorBooks)
                 {
                     String Author = ab.Author.Name;
@@ -432,7 +443,7 @@ namespace LibraryAppMVC.Controllers
                 }
                 b.Authors = AuthorList;
                 //a.Insert(i, b);  // This literally kills everything for some reason, but the code works without it
-            }
+            }*/
             return Json(a);
         }
 
