@@ -76,18 +76,23 @@ namespace LibraryAppMVC.Controllers
         public IActionResult UserInfo()
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            int userID = _ctx.Users
+            var user = _ctx.Users
                 .Where(u => u.SchoolID == schoolID)
-                .First()
-                .UserID;
+                .First();
+            int userID = user.UserID;
+
             var checkouts = _ctx.Checkouts
                 .Where(c => c.Active)
                 .Where(c => c.UserID == userID)
+                .Include(c => c.Book)
                 .ToList();
+
             var reservations = _ctx.Reservations
                 .Where(r => r.Active)
                 .Where(r => r.UserID == userID)
+                .Include(r => r.Book)
                 .ToList();
+
             foreach(Checkout c in checkouts)
             {
                 c.User = null;
@@ -96,7 +101,9 @@ namespace LibraryAppMVC.Controllers
             {
                 r.User = null;
             }
-            var resp = new { checkouts, reservations };
+            user.PasswordHash = null;
+            user.Salt = null;
+            var resp = new { checkouts, reservations, user};
             return Json(resp);
         }
 
@@ -394,20 +401,20 @@ namespace LibraryAppMVC.Controllers
             }
             else  // Title not specified
             {
-                if(page<1) { page = 1; }
-                int pos_i = (page-1) * 10;
+                if (page < 1) { page = 1; }
+                int pos_i = (page - 1) * 10;
                 int pos_f = page * 10;
                 int count = _ctx.Books.Count();
-                if(pos_f>count) { pos_f = count; }
-                if(pos_i>count) { a = new List<Book>(); }
+                if (pos_f > count) { pos_f = count; }
+                if (pos_i > count) { a = new List<Book>(); }
                 else
                 {
-                a = _ctx.Books
-                    .Include(book => book.Cover)
-                    .Include(book => book.AuthorBooks)
-                        .ThenInclude(ab => ab.Author)
-                    .ToList()
-                    .GetRange(pos_i, (pos_f-pos_i));
+                    a = _ctx.Books
+                        .Include(book => book.Cover)
+                        .Include(book => book.AuthorBooks)
+                            .ThenInclude(ab => ab.Author)
+                        .ToList()
+                        .GetRange(pos_i, (pos_f - pos_i));
                 }
             }
 
@@ -415,10 +422,10 @@ namespace LibraryAppMVC.Controllers
             {
                 Book b = a.ElementAt(i);
                 List<String> AuthorList = new List<String>();
-                foreach(AuthorBook ab in b.AuthorBooks)
+                foreach (AuthorBook ab in b.AuthorBooks)
                 {
                     String Author = ab.Author.Name;
-                    if(Author.Length>0)
+                    if (Author.Length > 0)
                     {
                         AuthorList.Add(Author);
                     }
@@ -475,6 +482,7 @@ namespace LibraryAppMVC.Controllers
             user.Salt = Convert.ToBase64String(salt);
             user.PasswordHash = hashed;
             _ctx.Users.Add(user);
+            _ctx.SaveChanges();
             int UserID = _ctx.Users
                 .Where(u => u.SchoolID == user.SchoolID)
                 .First()
