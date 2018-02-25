@@ -59,13 +59,10 @@ namespace LibraryAppMVC.Controllers
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             int userID = _ctx.Users
-                .Where(u => u.SchoolID == schoolID)
-                .First()
+                .Single(u => u.SchoolID == schoolID)
                 .UserID;
             _ctx.Users
-                .Where(u => u.UserID == userID)
-                .First()
-                .TokenVersion += 1;
+                .Single(u => u.UserID == userID);
             _ctx.SaveChanges();
             return Ok();
         }
@@ -77,8 +74,7 @@ namespace LibraryAppMVC.Controllers
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var user = _ctx.Users
-                .Where(u => u.SchoolID == schoolID)
-                .First();
+                .Single(u => u.SchoolID == schoolID);
             int userID = user.UserID;
 
             var checkouts = _ctx.Checkouts
@@ -137,9 +133,8 @@ namespace LibraryAppMVC.Controllers
             UserModel usermodel = null;
             try
             {
-                User =_ctx.Users
-                    .Where(u => u.SchoolID.Equals(login.Username))
-                    .First();
+                User = _ctx.Users
+                    .Single(u => u.SchoolID.Equals(login.Username));
             }
             catch
             {
@@ -203,14 +198,12 @@ namespace LibraryAppMVC.Controllers
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             int userID = _ctx.Users
-                .Where(u => u.SchoolID == schoolID)
-                .First()
+                .Single(u => u.SchoolID == schoolID)
                 .UserID;
 
             int limit = _ctx.UserUType_rel // Get max checked out books for usertype
-                .Where(ut => ut.UserID == userID)
                 .Include(ut => ut.UType)
-                .First()
+                .Single(ut => ut.UserID == userID)
                 .UType
                 .CheckoutLimit;
 
@@ -246,8 +239,7 @@ namespace LibraryAppMVC.Controllers
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             int userID = _ctx.Users
-                .Where(u => u.SchoolID == schoolID)
-                .First()
+                .Single(u => u.SchoolID == schoolID)
                 .UserID;
 
             _ctx.Checkouts
@@ -265,8 +257,7 @@ namespace LibraryAppMVC.Controllers
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             int userID = _ctx.Users
-                .Where(u => u.SchoolID == schoolID)
-                .First()
+                .Single(u => u.SchoolID == schoolID)
                 .UserID;
 
             Boolean BookAvailable = _ctx.Checkouts
@@ -305,13 +296,11 @@ namespace LibraryAppMVC.Controllers
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             int userID = _ctx.Users
-                .Where(u => u.SchoolID == schoolID)
-                .First()
+                .Single(u => u.SchoolID == schoolID)
                 .UserID;
 
             Boolean CheckedOut = _ctx.Checkouts
-                .Where(c => c.BookID == request.BookID)
-                .First()
+                .Single(c => c.BookID == request.BookID)
                 .Active == true;
 
             if(!CheckedOut)
@@ -338,8 +327,7 @@ namespace LibraryAppMVC.Controllers
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             int userID = _ctx.Users
-                .Where(u => u.SchoolID == schoolID)
-                .First()
+                .Single(u => u.SchoolID == schoolID)
                 .UserID;
 
             bool AlreadyReserved = _ctx.Reservations
@@ -396,7 +384,7 @@ namespace LibraryAppMVC.Controllers
                     .Where(b => b.Title.Contains(title))
                     .Include(book => book.Cover)
                     .Include(book => book.AuthorBooks)
-                        .ThenInclude(ab => ab.Author)
+                        .Select)
                     .ToList();
             }
             else  // Title not specified
@@ -410,7 +398,7 @@ namespace LibraryAppMVC.Controllers
                 else
                 {
                     a = _ctx.Books
-                        .Include(book => book.Cover)
+                        //.Include(book => book.Cover)
                         .Include(book => book.AuthorBooks)
                             .ThenInclude(ab => ab.Author)
                         .ToList()
@@ -418,16 +406,16 @@ namespace LibraryAppMVC.Controllers
                 }
             }
 
-            List<String> AuthorList = new List<String>();
             foreach(Book b in a) 
             {
-                b.Cover.Books = null;
+                List<String> AuthorList = new List<String>();
+                //b.Cover.Books = null;
                 foreach(AuthorBook ab in b.AuthorBooks)
                 {
                     AuthorList.Add(ab.Author.Name);
                 }
                 b.Authors = AuthorList;
-                b.AuthorBooks = null;
+                //b.AuthorBooks = null;
             }
             /*
             for (int i = 0; i < a.Count(); i++)  // This weird bit of code should probably not be changed, it caused a really hard, no error crash on the server, but it (probably) works now
@@ -495,8 +483,7 @@ namespace LibraryAppMVC.Controllers
             _ctx.Users.Add(user);
             _ctx.SaveChanges();
             int UserID = _ctx.Users
-                .Where(u => u.SchoolID == user.SchoolID)
-                .First()
+                .Single(u => u.SchoolID == user.SchoolID)
                 .UserID;
             _ctx.UserUType_rel
                 .Add(new UserUType { UserID = UserID, UTypeID = 1 });
