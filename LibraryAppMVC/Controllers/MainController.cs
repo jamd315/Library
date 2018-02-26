@@ -269,8 +269,6 @@ namespace LibraryAppMVC.Controllers
                 .Where(c => c.BookID == request.BookID && c.Active)
                 .Count() > 0;
 
-            BookAvailable = true;
-
             Boolean UserAlreadyReserved = _ctx.Reservations
                 .Where(r => r.Active && r.UserID == userID)
                 .Count() > 0;
@@ -310,8 +308,7 @@ namespace LibraryAppMVC.Controllers
             }
 
             Boolean CheckedOut = _ctx.Checkouts
-                .Single(c => c.BookID == request.BookID)
-                .Active == true;
+                .Any(c => c.BookID == request.BookID && c.UserID == userID && c.Active == true);
 
             if(!CheckedOut)
             {
@@ -470,6 +467,7 @@ namespace LibraryAppMVC.Controllers
         [HttpPost]
         public IActionResult AddUser([FromBody]NewUser newuser) // Checked 2/25/18 working
         {
+            if (newuser.UserTypeInt == 0) { newuser.UserTypeInt = 1; }
             User user = new User() { SchoolID = newuser.Username, Password = newuser.Password };
             byte[] salt = new byte[128 / 8];
             using (var rng = RandomNumberGenerator.Create())

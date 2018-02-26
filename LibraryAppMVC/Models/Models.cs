@@ -27,8 +27,10 @@ namespace LibraryAppMVC.Models
 
         public class NewUser
         {
+            public String FullName { get; set; }
             public String Username { get; set; }
             public String Password { get; set; }
+            public int UserTypeInt { get; set; }
         }
     }
 }
