@@ -1,3 +1,6 @@
+"""
+Puts covers into the database, because the base64 encoded bitmaps are to big for a clipboard
+"""
 import sys
 import base64
 
