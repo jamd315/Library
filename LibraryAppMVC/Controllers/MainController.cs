@@ -36,7 +36,7 @@ namespace LibraryAppMVC.Controllers
         }
     }
 
-    [Route("/user/")]
+    [Route("/user/")] // All endpoints checked 2/25/18, logout not working but not important (token dumped client side at logout)
     public class UserController : Controller
     {
         private IConfiguration _config;
@@ -50,11 +50,7 @@ namespace LibraryAppMVC.Controllers
             _logger = logger;
         }
 
-        /// <summary>
-        /// Lets a user login
-        /// </summary>
-        /// <param name="login"></param>
-        /// <returns>Returns a token if successful</returns>
+
         [Route("login")]
         [AllowAnonymous]
         [HttpPost]
@@ -73,7 +69,7 @@ namespace LibraryAppMVC.Controllers
         [Route("logout")]
         [Authorize]
         [HttpPost]
-        public IActionResult Logout() // Checked 2/24/18 NOT working TODO
+        public IActionResult Logout() // Checked 2/24/18 NOT working TODO, maybe not important
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             int userID = _ctx.Users
@@ -194,7 +190,7 @@ namespace LibraryAppMVC.Controllers
     }
 
 
-    [Route("/library/")]
+    [Route("/library/")] // All endpoints checked 2/25/18
     public class LibraryController : Controller
     {
         private Context _ctx;
@@ -271,7 +267,7 @@ namespace LibraryAppMVC.Controllers
         [Route("reserve")]
         [HttpPost]
         [Authorize]
-        public IActionResult ReserveBook([FromBody]TransactionRequest request)
+        public IActionResult ReserveBook([FromBody]TransactionRequest request) // Checked 2/25/18 working
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             int userID = _ctx.Users
@@ -310,7 +306,7 @@ namespace LibraryAppMVC.Controllers
         [Route("fill_reservation")]
         [HttpPost]
         [Authorize]
-        public IActionResult FillReservation([FromBody]TransactionRequest request)
+        public IActionResult FillReservation([FromBody]TransactionRequest request) // Checked 2/25/18 working
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             int userID = _ctx.Users
@@ -341,7 +337,7 @@ namespace LibraryAppMVC.Controllers
         [Route("renew")]
         [HttpPost]
         [Authorize]
-        public IActionResult RenewBook([FromBody]TransactionRequest request)
+        public IActionResult RenewBook([FromBody]TransactionRequest request) // Checked 2/25/18 working
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             int userID = _ctx.Users
@@ -381,7 +377,7 @@ namespace LibraryAppMVC.Controllers
     }
 
 
-    [Route("/simple/")]
+    [Route("/simple/")] // All endpoints checked 2/25/18
     public class SimpleController : Controller
     {
         private Context _ctx;
@@ -394,7 +390,7 @@ namespace LibraryAppMVC.Controllers
         [AllowAnonymous]
         [Route("books")]
         [HttpGet]
-        public IActionResult GetABook(string title, int page = 1)
+        public IActionResult GetABook(string title, int page = 1) // Checked 2/25/18 working
         {
             List<Book> a;
             if (title != null)  // Title specified
@@ -442,7 +438,7 @@ namespace LibraryAppMVC.Controllers
         [Route("checkouts")]
         [AllowAnonymous]
         [HttpGet]
-        public IActionResult GetCheckouts()
+        public IActionResult GetCheckouts() // Checked 2/25/18 working
         {
             var CheckoutList = _ctx.Checkouts
                 .Include(c => c.Book)
@@ -454,7 +450,7 @@ namespace LibraryAppMVC.Controllers
         [Route("reservations")]
         [AllowAnonymous]
         [HttpGet]
-        public IActionResult GetReservations()
+        public IActionResult GetReservations() // Checked 2/25/18 working
         {
             var CheckoutList = _ctx.Reservations
                 .Include(r => r.Book)
@@ -465,7 +461,7 @@ namespace LibraryAppMVC.Controllers
     }
 
 
-    [Route("/dev/")]
+    [Route("/dev/")] // All endpoints checked 2/25/18
     public class DevController : Controller
     {
         private Context _ctx;
@@ -474,31 +470,17 @@ namespace LibraryAppMVC.Controllers
             _ctx = context;
         }
 
-        
-        [Route("tokentest")]
-        [Authorize]
-        [HttpGet]
-        public IActionResult TestToken()
+        public class NewUser
         {
-            var a = new List<String>() { "aaa", "bbb", "ccc" };
-            return Json(a);
+            public string Username { get; set; }
+            public string Password { get; set; }
         }
-
-
-        [Route("booktest")]
-        [Authorize]
-        [HttpGet]
-        public IActionResult BookTest()
-        {
-            var a = _ctx.Books.Select(b => b.AuthorBooks).ToList();
-            return Json(a);
-        }
-
 
         [Route("adduser")]
         [HttpPost]
-        public IActionResult AddUser([FromBody]User user)
+        public IActionResult AddUser([FromBody]NewUser newuser) // Checked 2/25/18 working
         {
+            User user = new User() { SchoolID = newuser.Username, Password = newuser.Password };
             byte[] salt = new byte[128 / 8];
             using (var rng = RandomNumberGenerator.Create())
             {
