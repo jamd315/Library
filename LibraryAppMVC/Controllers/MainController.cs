@@ -9,17 +9,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using System.Web;
+using static LibraryAppMVC.Models.Models;
 
 namespace LibraryAppMVC.Controllers
 {
@@ -172,21 +167,6 @@ namespace LibraryAppMVC.Controllers
                 numBytesRequested: 256 / 8));
             return hashed.Equals(PasswordHash);
         }
-
-        public class LoginModel
-        {
-            public String Username { get; set; }
-            public String Password { get; set; }
-        }
-
-        public class UserModel
-        {
-            public String Name { get; set; }
-            public String StudentID { get; set; }
-            public int TokenVersion { get; set; }
-        }
-
-
     }
 
 
@@ -200,10 +180,6 @@ namespace LibraryAppMVC.Controllers
             _ctx = context;
         }
 
-        public class TransactionRequest
-        {
-            public int BookID { get; set; }
-        }
 
         [Route("checkout")]
         [HttpPost]
@@ -488,12 +464,6 @@ namespace LibraryAppMVC.Controllers
         public DevController(Context context)
         {
             _ctx = context;
-        }
-
-        public class NewUser
-        {
-            public string Username { get; set; }
-            public string Password { get; set; }
         }
 
         [Route("adduser")]
