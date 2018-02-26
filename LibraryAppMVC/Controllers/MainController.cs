@@ -215,6 +215,11 @@ namespace LibraryAppMVC.Controllers
                 .Single(u => u.SchoolID == schoolID)
                 .UserID;
 
+            if(!_ctx.Books.Any(b => b.BookID == request.BookID))
+            {
+                return StatusCode(409, "Book does not exist");
+            }
+
             int limit = _ctx.UserUType_rel // Get max checked out books for usertype
                 .Include(ut => ut.UType)
                 .Single(ut => ut.UserID == userID)
@@ -256,6 +261,11 @@ namespace LibraryAppMVC.Controllers
                 .Single(u => u.SchoolID == schoolID)
                 .UserID;
 
+            if (!_ctx.Books.Any(b => b.BookID == request.BookID))
+            {
+                return StatusCode(409, "Book does not exist");
+            }
+
             _ctx.Checkouts
                 .Where(c => c.BookID == request.BookID && c.UserID == userID)
                 .Last()
@@ -273,6 +283,11 @@ namespace LibraryAppMVC.Controllers
             int userID = _ctx.Users
                 .Single(u => u.SchoolID == schoolID)
                 .UserID;
+
+            if (!_ctx.Books.Any(b => b.BookID == request.BookID))
+            {
+                return StatusCode(409, "Book does not exist");
+            }
 
             Boolean BookAvailable = _ctx.Checkouts
                 .Where(c => c.BookID == request.BookID && c.Active)
@@ -312,6 +327,11 @@ namespace LibraryAppMVC.Controllers
             int userID = _ctx.Users
                 .Single(u => u.SchoolID == schoolID)
                 .UserID;
+
+            if (!_ctx.Books.Any(b => b.BookID == request.BookID))
+            {
+                return StatusCode(409, "Book does not exist");
+            }
 
             Boolean CheckedOut = _ctx.Checkouts
                 .Single(c => c.BookID == request.BookID)
