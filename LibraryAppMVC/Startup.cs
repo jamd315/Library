@@ -33,7 +33,6 @@ namespace LibraryAppMVC
              * https://auth0.com/blog/securing-asp-dot-net-core-2-applications-with-jwts/
              * https://blogs.msdn.microsoft.com/webdev/2017/04/06/jwt-validation-and-authorization-in-asp-net-core/
              * https://docs.microsoft.com/en-us/aspnet/core/migration/1x-to-2x/identity-2x
-             * https://fullstackmark.com/post/13/jwt-authentication-with-aspnet-core-2-web-api-angular-5-net-core-identity-and-facebook-login
              */
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>

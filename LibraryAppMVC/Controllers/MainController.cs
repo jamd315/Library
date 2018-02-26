@@ -69,7 +69,7 @@ namespace LibraryAppMVC.Controllers
         [Route("logout")]
         [Authorize]
         [HttpPost]
-        public IActionResult Logout() // Checked 2/24/18 NOT working TODO, maybe not important
+        public IActionResult Logout() // Checked 2/24/18 NOT working TODO, maybe not important because client dumps token on logout
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             int userID = _ctx.Users
