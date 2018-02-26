@@ -23,20 +23,38 @@ using System.Web;
 
 namespace LibraryAppMVC.Controllers
 {
+    [Route("")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public class SwaggerRedirectController : Controller
+    {
+        [Route("")]
+        [HttpGet]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public IActionResult RedirectToSwaggerUi()
+        {
+            return Redirect("swagger");
+        }
+    }
+
     [Route("/user/")]
-    public class LoginController : Controller
+    public class UserController : Controller
     {
         private IConfiguration _config;
         private Context _ctx;
         private readonly ILogger _logger;
 
-        public LoginController(IConfiguration config, Context context, ILogger<LoginController> logger)
+        public UserController(IConfiguration config, Context context, ILogger<UserController> logger)
         {
             _config = config;
             _ctx = context;
             _logger = logger;
         }
 
+        /// <summary>
+        /// Lets a user login
+        /// </summary>
+        /// <param name="login"></param>
+        /// <returns>Returns a token if successful</returns>
         [Route("login")]
         [AllowAnonymous]
         [HttpPost]
@@ -177,11 +195,11 @@ namespace LibraryAppMVC.Controllers
 
 
     [Route("/library/")]
-    public class CheckoutController : Controller
+    public class LibraryController : Controller
     {
         private Context _ctx;
 
-        public CheckoutController(Context context)
+        public LibraryController(Context context)
         {
             _ctx = context;
         }
@@ -364,17 +382,18 @@ namespace LibraryAppMVC.Controllers
 
 
     [Route("/simple/")]
-    public class MainController : Controller
+    public class SimpleController : Controller
     {
         private Context _ctx;
 
-        public MainController(Context context)
+        public SimpleController(Context context)
         {
             _ctx = context;
         }
 
         [AllowAnonymous]
         [Route("books")]
+        [HttpGet]
         public IActionResult GetABook(string title, int page = 1)
         {
             List<Book> a;
@@ -384,7 +403,7 @@ namespace LibraryAppMVC.Controllers
                     .Where(b => b.Title.Contains(title))
                     .Include(book => book.Cover)
                     .Include(book => book.AuthorBooks)
-                        .Select)
+                        .ThenInclude(ab => ab.Author)
                     .ToList();
             }
             else  // Title not specified
@@ -398,7 +417,7 @@ namespace LibraryAppMVC.Controllers
                 else
                 {
                     a = _ctx.Books
-                        //.Include(book => book.Cover)
+                        .Include(book => book.Cover)
                         .Include(book => book.AuthorBooks)
                             .ThenInclude(ab => ab.Author)
                         .ToList()
@@ -415,32 +434,33 @@ namespace LibraryAppMVC.Controllers
                     AuthorList.Add(ab.Author.Name);
                 }
                 b.Authors = AuthorList;
-                //b.AuthorBooks = null;
+                b.AuthorBooks = null;
             }
-            /*
-            for (int i = 0; i < a.Count(); i++)  // This weird bit of code should probably not be changed, it caused a really hard, no error crash on the server, but it (probably) works now
-            {
-                Book b = a.ElementAt(i);
-                foreach (AuthorBook ab in b.AuthorBooks)
-                {
-                    String Author = ab.Author.Name;
-                    if (Author.Length > 0)
-                    {
-                        AuthorList.Add(Author);
-                    }
-                }
-                b.Authors = AuthorList;
-                //a.Insert(i, b);  // This literally kills everything for some reason, but the code works without it
-            }*/
             return Json(a);
         }
 
-        [Authorize]
-        [Route("user")]
-        public IActionResult GetUserInfo()
+        [Route("checkouts")]
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult GetCheckouts()
         {
-            string userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            return Ok(userId);
+            var CheckoutList = _ctx.Checkouts
+                .Include(c => c.Book)
+                .Where(c => c.Active)
+                .ToList();
+            return Json(CheckoutList);
+        }
+
+        [Route("reservations")]
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult GetReservations()
+        {
+            var CheckoutList = _ctx.Reservations
+                .Include(r => r.Book)
+                .Where(r => r.Active)
+                .ToList();
+            return Json(CheckoutList);
         }
     }
 
@@ -457,14 +477,26 @@ namespace LibraryAppMVC.Controllers
         
         [Route("tokentest")]
         [Authorize]
+        [HttpGet]
         public IActionResult TestToken()
         {
             var a = new List<String>() { "aaa", "bbb", "ccc" };
             return Json(a);
         }
-        
+
+
+        [Route("booktest")]
+        [Authorize]
+        [HttpGet]
+        public IActionResult BookTest()
+        {
+            var a = _ctx.Books.Select(b => b.AuthorBooks).ToList();
+            return Json(a);
+        }
+
 
         [Route("adduser")]
+        [HttpPost]
         public IActionResult AddUser([FromBody]User user)
         {
             byte[] salt = new byte[128 / 8];

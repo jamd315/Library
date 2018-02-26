@@ -42,6 +42,7 @@ namespace DatabaseConnect.Entities
         public Author Author { get; set; }
         public int AuthorID { get; set; }
         public Book Book { get; set; }
+        [ForeignKey("Book")]
         public int BookID { get; set; }
     }
 

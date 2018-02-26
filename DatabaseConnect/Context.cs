@@ -12,7 +12,6 @@ namespace DatabaseConnect
     {
         public Context(DbContextOptions DbCfg) : base(DbCfg)
         {
-
         }
         // Simple
         public DbSet<Book> Books { get; set; }

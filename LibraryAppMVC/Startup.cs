@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace LibraryAppMVC
 {
@@ -56,14 +57,19 @@ namespace LibraryAppMVC
 
             services.AddSingleton(Configuration);
 
-            services.AddDbContext<Context>(options => options.UseSqlServer(Configuration["ConnectionString"]));
+            services.AddDbContext<Context>(options => options.UseSqlServer(Configuration.GetConnectionString("TheDatabase")));
             services.AddMvc()
                 .AddJsonOptions(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "FBLA Mobile App", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            var redirOpt = new RewriteOptions();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -71,14 +77,18 @@ namespace LibraryAppMVC
             }
             else
             {
-                // HTTPS redirector
                 app.UseExceptionHandler("/Home/Error");
-                var options = new RewriteOptions().AddRedirectToHttps();
-                app.UseRewriter(options);
+                // HTTPS redirector
+                redirOpt.AddRedirectToHttps();
             }
-
+            app.UseRewriter(redirOpt);
             app.UseAuthentication();
             app.UseStaticFiles();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "FBLA Mobile App v1");
+            });
 
             app.UseMvc(routes =>
             {
