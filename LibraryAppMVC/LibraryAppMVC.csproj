@@ -44,4 +44,18 @@
     <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\images\41jp-9I57KL._SX326_BO1,204,203,200_.jpg" />
+    <None Include="wwwroot\images\41nAFREvHAL._SX329_BO1,204,203,200_.jpg" />
+    <None Include="wwwroot\images\41ojAS1IpsL._SX275_BO1,204,203,200_.jpg" />
+    <None Include="wwwroot\images\51+YQWuZPtL._SX322_BO1,204,203,200_.jpg" />
+    <None Include="wwwroot\images\512EZqN2hGL._SX372_BO1,204,203,200_.jpg" />
+    <None Include="wwwroot\images\51HSkTKlauL._SX346_BO1,204,203,200_.jpg" />
+    <None Include="wwwroot\images\51khWutZqCL._SX325_BO1,204,203,200_.jpg" />
+    <None Include="wwwroot\images\51R8AA8QEVL._SX322_BO1,204,203,200_.jpg" />
+    <None Include="wwwroot\images\51ZgqYqwuAL._SX322_BO1,204,203,200_.jpg" />
+    <None Include="wwwroot\images\61+3z1o4oUL._SX334_BO1,204,203,200_.jpg" />
+    <None Include="wwwroot\images\617F0bkL+WL._SY425_BO1,204,203,200_.jpg" />
+  </ItemGroup>
+
 </Project>

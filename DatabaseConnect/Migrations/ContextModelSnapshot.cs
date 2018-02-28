@@ -52,7 +52,7 @@ namespace DatabaseConnect.Migrations
                     b.Property<int>("BookID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("CoverID");
+                    b.Property<string>("Description");
 
                     b.Property<string>("DeweyDecimal")
                         .ValueGeneratedOnAdd()
@@ -64,13 +64,13 @@ namespace DatabaseConnect.Migrations
 
                     b.Property<string>("ISBN");
 
+                    b.Property<string>("ImagePath");
+
                     b.Property<int>("PageCount");
 
                     b.Property<string>("Title");
 
                     b.HasKey("BookID");
-
-                    b.HasIndex("CoverID");
 
                     b.ToTable("tblBook");
                 });
@@ -99,20 +99,6 @@ namespace DatabaseConnect.Migrations
                     b.HasIndex("UserID");
 
                     b.ToTable("tblCheckouts");
-                });
-
-            modelBuilder.Entity("DatabaseConnect.Entities.Cover", b =>
-                {
-                    b.Property<int>("CoverID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Base64Encoded");
-
-                    b.Property<int>("BookID");
-
-                    b.HasKey("CoverID");
-
-                    b.ToTable("tblCovers");
                 });
 
             modelBuilder.Entity("DatabaseConnect.Entities.Reservation", b =>
@@ -196,14 +182,6 @@ namespace DatabaseConnect.Migrations
                     b.HasOne("DatabaseConnect.Entities.Book", "Book")
                         .WithMany("AuthorBooks")
                         .HasForeignKey("BookID")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("DatabaseConnect.Entities.Book", b =>
-                {
-                    b.HasOne("DatabaseConnect.Entities.Cover", "Cover")
-                        .WithMany("Books")
-                        .HasForeignKey("CoverID")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

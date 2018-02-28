@@ -26,14 +26,14 @@ namespace DatabaseConnect.Entities
         public int BookID { get; set; }
         public string Title { get; set; }
         public int PageCount { get; set; }
-        public Cover Cover { get; set; }
         public IEnumerable<AuthorBook> AuthorBooks { get; set; }
         [NotMapped]
         public IList<String> Authors { get; set; }
         public String ISBN { get; set; }
         public String DeweyDecimal { get; set; }
         public String FicID { get; set; }
-        public int CoverID { get; set; }  // Order matters
+        public String Description { get; set; }
+        public String ImagePath { get; set; }
     }
 
     [Table("tblAuthorBook")]
@@ -44,16 +44,6 @@ namespace DatabaseConnect.Entities
         public Book Book { get; set; }
         [ForeignKey("Book")]
         public int BookID { get; set; }
-    }
-
-    [Table("tblCovers")]
-    public class Cover
-    {
-        [Key]
-        public int CoverID { get; set; }
-        public int BookID { get; set; }
-        public List<Book> Books { get; set; }
-        public String Base64Encoded { get; set; }
     }
 
     [Table("tblUsers")]

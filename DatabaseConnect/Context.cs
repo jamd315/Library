@@ -11,7 +11,6 @@ namespace DatabaseConnect
         // Simple
         public DbSet<Book> Books { get; set; }
         public DbSet<Author> Authors { get; set; }
-        public DbSet<Cover> Covers { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<UType> UTypes { get; set; }
         public DbSet<Checkout> Checkouts { get; set; }

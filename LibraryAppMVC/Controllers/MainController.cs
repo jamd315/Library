@@ -380,8 +380,8 @@ namespace LibraryAppMVC.Controllers
             _ctx = context;
         }
 
-        [AllowAnonymous]
         [Route("books")]
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult GetABook(string title, int page = 1) // Checked 2/25/18 working
         {
@@ -390,7 +390,6 @@ namespace LibraryAppMVC.Controllers
             {
                 a = _ctx.Books
                     .Where(b => b.Title.Contains(title))
-                    .Include(book => book.Cover)
                     .Include(book => book.AuthorBooks)
                         .ThenInclude(ab => ab.Author)
                     .ToList();
@@ -406,7 +405,6 @@ namespace LibraryAppMVC.Controllers
                 else
                 {
                     a = _ctx.Books
-                        .Include(book => book.Cover)
                         .Include(book => book.AuthorBooks)
                             .ThenInclude(ab => ab.Author)
                         .ToList()
@@ -417,7 +415,6 @@ namespace LibraryAppMVC.Controllers
             foreach(Book b in a) 
             {
                 List<String> AuthorList = new List<String>();
-                //b.Cover.Books = null;
                 foreach(AuthorBook ab in b.AuthorBooks)
                 {
                     AuthorList.Add(ab.Author.Name);

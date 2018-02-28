@@ -14,6 +14,8 @@ using System.Text;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
 
 namespace LibraryAppMVC
 {
@@ -82,7 +84,13 @@ namespace LibraryAppMVC
             }
             app.UseRewriter(redirOpt);
             app.UseAuthentication();
-            app.UseStaticFiles();
+            app.UseFileServer(new FileServerOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+            Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images")),
+                RequestPath = "/images",
+                EnableDirectoryBrowsing = true
+            });
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
