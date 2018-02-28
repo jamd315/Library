@@ -23,13 +23,11 @@ namespace LibraryAppMVC.Controllers
     {
         private IConfiguration _config;
         private Context _ctx;
-        private readonly ILogger _logger;
 
-        public UserController(IConfiguration config, Context context, ILogger<UserController> logger)
+        public UserController(IConfiguration config, Context context)
         {
             _config = config;
             _ctx = context;
-            _logger = logger;
         }
 
 

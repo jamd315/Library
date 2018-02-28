@@ -3,6 +3,7 @@ using DatabaseConnect.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +15,11 @@ namespace LibraryAppMVC.Controllers
     public class SimpleController : Controller
     {
         private Context _ctx;
-
-        public SimpleController(Context context)
+        private IConfiguration _cfg;
+        public SimpleController(Context context, IConfiguration config)
         {
             _ctx = context;
+            _cfg = config;
         }
 
         [Route("books")]
@@ -25,6 +27,7 @@ namespace LibraryAppMVC.Controllers
         [HttpGet]
         public IActionResult GetABook(string title, int page = 1) // Checked 2/25/18 working
         {
+            int PerPageCount = Int32.Parse(_cfg["PerPageCount"]);
             List<Book> a;
             if (title != null)  // Title specified
             {
@@ -36,19 +39,25 @@ namespace LibraryAppMVC.Controllers
             }
             else  // Title not specified
             {
-                if (page < 1) { page = 1; }
-                int pos_i = (page - 1) * 10;
-                int pos_f = page * 10;
-                int count = _ctx.Books.Count();
-                if (pos_f > count) { pos_f = count; }
-                if (pos_i > count) { a = new List<Book>(); }
-                else
+                a = _ctx.Books
+                            .Include(book => book.AuthorBooks)
+                                .ThenInclude(ab => ab.Author)
+                            .ToList();
+                if (Boolean.Parse(_cfg["DoPages"]))
                 {
-                    a = _ctx.Books
-                        .Include(book => book.AuthorBooks)
-                            .ThenInclude(ab => ab.Author)
-                        .ToList()
-                        .GetRange(pos_i, (pos_f - pos_i));
+                    if (page < 1) { page = 1; }
+                    int pos_i = (page - 1) * 10;
+                    int pos_f = page * 10;
+                    int count = _ctx.Books.Count();
+                    if (pos_f > count) { pos_f = count; }
+                    if (pos_i > count)
+                    {
+                        a = new List<Book>();
+                    }
+                    else
+                    {
+                        a = a.GetRange(pos_i, (pos_f - pos_i));
+                    }
                 }
             }
 

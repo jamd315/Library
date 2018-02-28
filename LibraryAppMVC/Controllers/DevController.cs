@@ -2,6 +2,7 @@
 using DatabaseConnect.Entities;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +16,11 @@ namespace LibraryAppMVC.Controllers
     public class DevController : Controller
     {
         private Context _ctx;
-        public DevController(Context context)
+        private readonly ILogger _logger;
+        public DevController(Context context, ILogger<UserController> logger)
         {
             _ctx = context;
+            _logger = logger;
         }
 
         [Route("adduser")]
