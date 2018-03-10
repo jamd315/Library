@@ -18,7 +18,7 @@ using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace LibraryAppMVC.Controllers
 {
-    [Route("/user/")] // All endpoints checked 2/25/18, logout not working but not important (token dumped client side at logout)
+    [Route("user")] // All endpoints checked 2/25/18, logout not working but not important (token dumped client side at logout)
     public class UserController : Controller
     {
         private IConfiguration _config;

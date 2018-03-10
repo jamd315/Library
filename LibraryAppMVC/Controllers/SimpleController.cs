@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace LibraryAppMVC.Controllers
 {
-    [Route("/simple/")] // All endpoints checked 2/25/18
+    [Route("simple")] // All endpoints checked 2/25/18
     public class SimpleController : Controller
     {
         private Context _ctx;

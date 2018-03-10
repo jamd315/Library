@@ -32,5 +32,14 @@ namespace LibraryAppMVC.Models
             public String Password { get; set; }
             public int UserTypeInt { get; set; }
         }
+
+        public class SearchRequest
+        {
+            public int BookID { get; set; }
+            public String Author { get; set; }
+            public String Title { get; set; }
+            public String Category { get; set; }
+
+        }
     }
 }

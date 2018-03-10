@@ -12,7 +12,7 @@ using static LibraryAppMVC.Models.Models;
 
 namespace LibraryAppMVC.Controllers
 {
-    [Route("/library/")] // All endpoints checked 2/25/18
+    [Route("library")] // All endpoints checked 2/25/18
     public class LibraryController : Controller
     {
         private Context _ctx;
