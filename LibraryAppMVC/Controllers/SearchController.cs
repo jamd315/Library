@@ -8,6 +8,8 @@ using static LibraryAppMVC.Models.Models;
 using DatabaseConnect;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using DatabaseConnect.Entities;
 
 namespace LibraryAppMVC.Controllers
 {
@@ -17,21 +19,20 @@ namespace LibraryAppMVC.Controllers
         private Context _ctx;
         private IConfiguration _cfg;
         private readonly ILogger _logger;
-        public SearchController(Context context, IConfiguration config, ILogger logger)
+        public SearchController(Context context, IConfiguration config)//, ILogger<SearchController> logger)
         {
             _ctx = context;
             _cfg = config;
-            _logger = logger;
+            //_logger = logger;
         }
         [HttpGet]
         [Route("")]
-        public IActionResult Search([FromQuery] SearchRequest request)
+        public async Task<IActionResult> Search([FromQuery] SearchRequest request)
         {
-            _logger.Log(Json(request));
             if(request == null) { return BadRequest(); }
             if(request.Author == null && request.Title == null && request.Category == null && request.BookID == 0) { return BadRequest("You need to specify at least one category"); }
             
-            var Books = _ctx.Books.ToAsyncEnumerable();
+            var Books = await _ctx.Books.ToListAsync();
             if(request.BookID != 0)
             {
                 try
@@ -43,15 +44,16 @@ namespace LibraryAppMVC.Controllers
                     return BadRequest($"Error when searching for BookID {request.BookID}");
                 }
             }
+            IEnumerable<Book> result; // Not working TODO
             if(request.Author != null)
             {
-                Books = Books.Where(b => b.Authors.Contains(request.Author));
+                result = Books.Where(b => b.Authors.Contains(request.Author));  // maybe apppend instead? TODO
             }
             if(request.Title != null)
             {
-                Books = Books.Where(b => b.Title.Contains(request.Title));
+                result = Books.Where(b => b.Title.Contains(request.Title));
             }
-            return Ok(Books.Count());
+            return Ok(Books.ToList());
         }
     }
 }

@@ -34,6 +34,7 @@ namespace DatabaseConnect.Entities
         public String FicID { get; set; }
         public String Description { get; set; }
         public String ImagePath { get; set; }
+        //public Double Stars { get; set; } // From goodreads
     }
 
     [Table("tblAuthorBook")]

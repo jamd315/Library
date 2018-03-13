@@ -25,43 +25,25 @@ namespace LibraryAppMVC.Controllers
         [Route("books")]
         [AllowAnonymous]
         [HttpGet]
-        public IActionResult GetABook(string title, int page = 1) // Checked 2/25/18 working
+        public IActionResult GetABook(int page = 1) // Checked 2/25/18 working
         {
             int PerPageCount = Int32.Parse(_cfg["PerPageCount"]);
-            List<Book> a;
-            if (title != null)  // Title specified
+            var BookQuery = _ctx.Books
+                        .Include(book => book.AuthorBooks)
+                            .ThenInclude(ab => ab.Author)
+                        .ToList();
+            int PageCount = Int32.Parse(_cfg["PerPageCount"]);
+            var results = new List<Book>();
+            if (Boolean.Parse(_cfg["DoPages"]))
             {
-                a = _ctx.Books
-                    .Where(b => b.Title.Contains(title))
-                    .Include(book => book.AuthorBooks)
-                        .ThenInclude(ab => ab.Author)
-                    .ToList();
+                results = BookQuery.Skip(page * PageCount).Take(PageCount).ToList();
             }
-            else  // Title not specified
+            else
             {
-                a = _ctx.Books
-                            .Include(book => book.AuthorBooks)
-                                .ThenInclude(ab => ab.Author)
-                            .ToList();
-                if (Boolean.Parse(_cfg["DoPages"]))
-                {
-                    if (page < 1) { page = 1; }
-                    int pos_i = (page - 1) * 10;
-                    int pos_f = page * 10;
-                    int count = _ctx.Books.Count();
-                    if (pos_f > count) { pos_f = count; }
-                    if (pos_i > count)
-                    {
-                        a = new List<Book>();
-                    }
-                    else
-                    {
-                        a = a.GetRange(pos_i, (pos_f - pos_i));
-                    }
-                }
+                results = new List<Book>();  // TODO
             }
 
-            foreach (Book b in a)
+            foreach (Book b in results)
             {
                 List<String> AuthorList = new List<String>();
                 foreach (AuthorBook ab in b.AuthorBooks)
@@ -71,7 +53,7 @@ namespace LibraryAppMVC.Controllers
                 b.Authors = AuthorList;
                 b.AuthorBooks = null;
             }
-            return Json(a);
+            return Json(results);
         }
 
         [Route("checkouts")]
