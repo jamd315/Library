@@ -40,7 +40,7 @@ namespace LibraryAppMVC.Controllers
             }
             else
             {
-                results = new List<Book>();  // TODO
+                results = BookQuery;
             }
 
             foreach (Book b in results)

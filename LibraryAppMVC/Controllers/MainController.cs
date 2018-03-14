@@ -27,6 +27,8 @@ namespace LibraryAppMVC.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult RedirectToSwaggerUi()
         {
+            // Put the one you're using on top
+            return Redirect("/admin");
             return Redirect("swagger");
         }
     }

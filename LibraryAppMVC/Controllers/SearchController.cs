@@ -44,14 +44,20 @@ namespace LibraryAppMVC.Controllers
                     return BadRequest($"Error when searching for BookID {request.BookID}");
                 }
             }
-            IEnumerable<Book> result; // Not working TODO
+            List<Book> result = new List<Book>(); // Not working TODO
             if(request.Author != null)
             {
-                result = Books.Where(b => b.Authors.Contains(request.Author));  // maybe apppend instead? TODO
+                result.Union(
+                    Books
+                        .Where(b => b.Authors.Contains(request.Author))
+                );
             }
             if(request.Title != null)
             {
-                result = Books.Where(b => b.Title.Contains(request.Title));
+                result.Union(
+                    Books
+                        .Where(b => b.Title.Contains(request.Title))
+                );
             }
             return Ok(Books.ToList());
         }

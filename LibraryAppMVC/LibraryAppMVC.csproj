@@ -7,17 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Views\**" />
-    <Content Remove="Views\**" />
-    <EmbeddedResource Remove="Views\**" />
-    <None Remove="Views\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Controllers\HomeController.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Properties\PublishProfiles\lizardswimmer - Web Deploy.pubxml" />
   </ItemGroup>
 

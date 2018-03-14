@@ -35,6 +35,7 @@ namespace LibraryAppMVC
              * https://auth0.com/blog/securing-asp-dot-net-core-2-applications-with-jwts/
              * https://blogs.msdn.microsoft.com/webdev/2017/04/06/jwt-validation-and-authorization-in-asp-net-core/
              * https://docs.microsoft.com/en-us/aspnet/core/migration/1x-to-2x/identity-2x
+             * This part is how the token authentication works
              */
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
@@ -82,27 +83,28 @@ namespace LibraryAppMVC
                 // HTTPS redirector
                 redirOpt.AddRedirectToHttps();
             }
+
             app.UseRewriter(redirOpt);
             app.UseAuthentication();
+            // Serve book images
+
             app.UseFileServer(new FileServerOptions
             {
                 FileProvider = new PhysicalFileProvider(
-            Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images")),
-                RequestPath = "/images",
-                EnableDirectoryBrowsing = true
+                    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images")),
+                    RequestPath = "/images",
+                    EnableDirectoryBrowsing = true
             });
+
+            // Use Swagger, add json endpoint
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "FBLA Mobile App v1");
             });
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
+            app.UseStaticFiles();
+            app.UseMvcWithDefaultRoute();
         }
     }
 }
