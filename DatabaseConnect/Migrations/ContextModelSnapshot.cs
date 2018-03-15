@@ -128,6 +128,8 @@ namespace DatabaseConnect.Migrations
                     b.Property<int>("UserID")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<double>("FineAmount");
+
                     b.Property<string>("FullName");
 
                     b.Property<string>("PasswordHash");

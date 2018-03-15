@@ -59,6 +59,7 @@ namespace DatabaseConnect.Entities
         [NotMapped]
         public String Password { get; set; }
         public int TokenVersion { get; set; }
+        public double FineAmount { get; set; }
     }
 
     [Table("tblUType")]
