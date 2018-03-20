@@ -2,6 +2,7 @@
 using DatabaseConnect.Entities;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -12,20 +13,22 @@ using static LibraryAppMVC.Models.Models;
 
 namespace LibraryAppMVC.Controllers
 {
-    [Route("dev")] // All endpoints checked 2/25/18
+    [Route("dev")]
     public class DevController : Controller
     {
         private Context _ctx;
         private readonly ILogger _logger;
-        public DevController(Context context, ILogger<UserController> logger)
+        private IConfiguration _cfg;
+        public DevController(Context context, ILogger<DevController> logger, IConfiguration config)
         {
             _ctx = context;
             _logger = logger;
+            _cfg = config;
         }
 
         [Route("adduser")]
         [HttpPost]
-        public IActionResult AddUser([FromBody]NewUser newuser) // Checked 2/25/18 working
+        public IActionResult AddUser([FromBody]NewUser newuser)
         {
             if (newuser.UserTypeInt == 0) { newuser.UserTypeInt = 1; }
             User user = new User() { SchoolID = newuser.Username, Password = newuser.Password };
@@ -43,14 +46,13 @@ namespace LibraryAppMVC.Controllers
             user.Salt = Convert.ToBase64String(salt);
             user.PasswordHash = hashed;
             _ctx.Users.Add(user);
-            _ctx.SaveChanges();
             int UserID = _ctx.Users
                 .Single(u => u.SchoolID == user.SchoolID)
                 .UserID;
             _ctx.UserUType_rel
                 .Add(new UserUType { UserID = UserID, UTypeID = 1 });
-            _ctx.SaveChanges();
-            return Ok();
+            _ctx.SaveChangesAsync();
+            return Ok($"Successfully added user with ID {user.SchoolID}");
         }
     }
 }
