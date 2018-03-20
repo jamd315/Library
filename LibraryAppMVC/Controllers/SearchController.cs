@@ -25,12 +25,25 @@ namespace LibraryAppMVC.Controllers
             _cfg = config;
             //_logger = logger;
         }
+
+        class SearchResult
+        {
+            private Context _ctx;
+            public SearchResult(Context context, SearchRequest request)
+            {
+                if (request == null) { throw new Exception(); } // Null request received
+                if (request.Author == null && request.Title == null && request.Category == null && request.BookID == 0) { throw new Exception(); } //"You need to specify at least one category"
+                _ctx = context;
+                var test = _ctx.Books.Where(b => true);
+            }
+            
+        }
+
         [HttpGet]
         [Route("")]
         public async Task<IActionResult> Search([FromQuery] SearchRequest request)
         {
-            if(request == null) { return BadRequest("Null request received"); }
-            if(request.Author == null && request.Title == null && request.Category == null && request.BookID == 0) { return BadRequest("You need to specify at least one category"); }
+            
             
             var Books = await _ctx.Books
                 .Include(b => b.AuthorBooks)
