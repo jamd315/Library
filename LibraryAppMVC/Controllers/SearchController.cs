@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static LibraryAppMVC.Models.Models;
 using DatabaseConnect;
@@ -14,7 +13,7 @@ using DatabaseConnect.Entities;
 namespace LibraryAppMVC.Controllers
 {
     [Route("search")]
-    public class SearchController : Controller
+    public class SearchController : Controller  // Still under construction
     {
         private Context _ctx;
         private IConfiguration _cfg;
@@ -25,7 +24,7 @@ namespace LibraryAppMVC.Controllers
             _cfg = config;
             //_logger = logger;
         }
-
+        /*  Still being worked on
         class SearchResult
         {
             private Context _ctx;
@@ -38,7 +37,7 @@ namespace LibraryAppMVC.Controllers
             }
             
         }
-
+        */
         [HttpGet]
         [Route("")]
         public async Task<IActionResult> Search([FromQuery] SearchRequest request)

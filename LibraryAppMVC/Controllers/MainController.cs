@@ -28,8 +28,8 @@ namespace LibraryAppMVC.Controllers
         public IActionResult RedirectToSwaggerUi()
         {
             // Put the one you're using on top
-            return Redirect("/admin");
             return Redirect("swagger");
+            return Redirect("/admin");
         }
     }
 }
