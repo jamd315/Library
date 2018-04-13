@@ -3,6 +3,7 @@ using DatabaseConnect.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +17,12 @@ namespace LibraryAppMVC.Controllers
     public class LibraryController : Controller
     {
         private Context _ctx;
+        private IConfiguration _cfg;
 
-        public LibraryController(Context context)
+        public LibraryController(Context context, IConfiguration config)
         {
             _ctx = context;
+            _cfg = config;
         }
 
 
@@ -64,7 +67,7 @@ namespace LibraryAppMVC.Controllers
             }
 
             _ctx.Checkouts
-                .Add(new Checkout { BookID = request.BookID, UserID = userID, Active = true, CheckoutDate = DateTime.Now, DueDate = DateTime.Now.AddDays(14) });
+                .Add(new Checkout { BookID = request.BookID, UserID = userID, Active = true, CheckoutDate = DateTime.Now, DueDate = DateTime.Now.AddDays(Int32.Parse(_cfg["CheckoutLengthDays"])) });
             _ctx.SaveChanges();
             return Ok();
         }
