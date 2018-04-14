@@ -38,7 +38,7 @@ namespace LibraryAppMVC.Controllers
 
             if (!_ctx.Books.Any(b => b.BookID == request.BookID))
             {
-                return StatusCode(409, "Book does not exist");
+                return StatusCode(404, "Book does not exist");
             }
 
             int limit = _ctx.UserUType_rel // Get max checked out books for usertype
@@ -63,13 +63,13 @@ namespace LibraryAppMVC.Controllers
 
             if (CheckedOut)
             {
-                return StatusCode(409, "Already checked out");
+                return StatusCode(410, "Already checked out");
             }
-
+            Checkout checkout = new Checkout { BookID = request.BookID, UserID = userID, Active = true, CheckoutDate = DateTime.Now, DueDate = DateTime.Now.AddDays(Int32.Parse(_cfg["CheckoutLengthDays"])) };
             _ctx.Checkouts
-                .Add(new Checkout { BookID = request.BookID, UserID = userID, Active = true, CheckoutDate = DateTime.Now, DueDate = DateTime.Now.AddDays(Int32.Parse(_cfg["CheckoutLengthDays"])) });
+                .Add(checkout);
             _ctx.SaveChanges();
-            return Ok();
+            return Json(new ReturnModel() { Msg = "Checked Out" });
         }
 
         [Route("checkin")]
@@ -84,7 +84,7 @@ namespace LibraryAppMVC.Controllers
 
             if (!_ctx.Books.Any(b => b.BookID == request.BookID))
             {
-                return StatusCode(409, "Book does not exist");
+                return StatusCode(404, "Book does not exist");
             }
 
             _ctx.Checkouts
@@ -92,7 +92,7 @@ namespace LibraryAppMVC.Controllers
                 .Last()
                 .Active = false;
             _ctx.SaveChanges();
-            return Ok();
+            return Json(new ReturnModel() { Msg = "Checked In" });
         }
 
         [Route("reserve")]
@@ -107,33 +107,25 @@ namespace LibraryAppMVC.Controllers
 
             if (!_ctx.Books.Any(b => b.BookID == request.BookID))
             {
-                return StatusCode(409, "Book does not exist");
+                return StatusCode(404, "Book does not exist");
             }
-
-            Boolean BookAvailable = _ctx.Checkouts
-                .Where(c => c.BookID == request.BookID && c.Active)
-                .Count() > 0;
 
             Boolean UserAlreadyReserved = _ctx.Reservations
                 .Where(r => r.Active && r.UserID == userID)
                 .Count() > 0;
 
-            if (!UserAlreadyReserved || !BookAvailable)
+            if (!UserAlreadyReserved)
             {
                 _ctx.Reservations
                     .Add(new Reservation { BookID = request.BookID, UserID = userID, Datetime = DateTime.Now, Active = true });
                 _ctx.SaveChanges();
-                return Ok();
+                return Json(new ReturnModel() { Msg = "Reserved" });
             }
             else if (UserAlreadyReserved)
             {
                 return StatusCode(409, "You have already reserved this book");
             }
-            else if (BookAvailable)
-            {
-                return StatusCode(409, "This book can be checked out now, not reserved");
-            }
-            return StatusCode(500);
+            return StatusCode(500);  // Should be unreachable
 
         }
 
@@ -149,7 +141,7 @@ namespace LibraryAppMVC.Controllers
 
             if (!_ctx.Books.Any(b => b.BookID == request.BookID))
             {
-                return StatusCode(409, "Book does not exist");
+                return StatusCode(404, "Book does not exist");
             }
 
             Boolean CheckedOut = _ctx.Checkouts
@@ -168,7 +160,7 @@ namespace LibraryAppMVC.Controllers
             }
             else
             {
-                return StatusCode(409, "Book already checked out");
+                return StatusCode(410, "Book already checked out");
             }
         }
 
@@ -192,7 +184,7 @@ namespace LibraryAppMVC.Controllers
                 .Renewals > 2;
             if (AlreadyReserved || OverRenewals)
             {
-                return Forbid();
+                return StatusCode(409);
             }
             DateTime Checkout = _ctx.Checkouts
                 .Where(c => c.Active && c.BookID.Equals(request.BookID) && c.UserID.Equals(userID))
@@ -210,7 +202,7 @@ namespace LibraryAppMVC.Controllers
                 .First()
                 .Renewals += 1;
             _ctx.SaveChanges();
-            return Ok();
+            return Json(new ReturnModel() { Msg = "Book renewed" });
         }
     }
 }
