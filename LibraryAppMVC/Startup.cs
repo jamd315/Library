@@ -60,6 +60,7 @@ namespace LibraryAppMVC
             services.AddSingleton(Configuration);
 
             services.AddDbContext<Context>(options => options.UseSqlServer(Configuration.GetConnectionString("TheDatabase")));
+            //services.AddResponseCaching();
             services.AddMvc()
                 .AddJsonOptions(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddSwaggerGen(c =>
@@ -86,8 +87,9 @@ namespace LibraryAppMVC
 
             app.UseRewriter(redirOpt);
             app.UseAuthentication();
-            // Serve book images
+            //app.UseResponseCaching();
 
+            // Serve book images
             app.UseFileServer(new FileServerOptions
             {
                 FileProvider = new PhysicalFileProvider(

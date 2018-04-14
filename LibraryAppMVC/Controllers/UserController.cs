@@ -36,13 +36,14 @@ namespace LibraryAppMVC.Controllers
         [HttpPost]
         public IActionResult CreateToken([FromBody]LoginModel login) // Checked 2/24/18 working
         {
-            IActionResult response = Unauthorized();
+            IActionResult response = StatusCode(401, "Bad login");
             var user = Authenticate(login);
-
+            
             if (user != null)
             {
                 response = BuildToken(user);
             }
+                        
             return response;
         }
 
