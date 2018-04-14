@@ -1,20 +1,6 @@
-﻿using DatabaseConnect;
-using DatabaseConnect.Entities;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
-using static LibraryAppMVC.Models.Models;
 
 namespace LibraryAppMVC.Controllers
 {
@@ -22,14 +8,27 @@ namespace LibraryAppMVC.Controllers
     [ApiExplorerSettings(IgnoreApi = true)]
     public class SwaggerRedirectController : Controller
     {
+        private IConfiguration _cfg;
+        public SwaggerRedirectController(IConfiguration config)
+        {
+            _cfg = config;
+        }
+
+
         [Route("")]
         [HttpGet]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public IActionResult RedirectToSwaggerUi()
+        public IActionResult RedirectTo()
         {
-            // Put the one you're using on top
-            return Redirect("swagger");
-            return Redirect("/admin");
+            if(Boolean.Parse(_cfg["DoAdminHomePage"]))
+            {
+                return Redirect("admin");
+            }
+            else if(Boolean.Parse(_cfg["DoSwaggerHomePage"]))
+            {
+                return Redirect("swagger");
+            }
+            return Ok("Config misconfigured");
         }
     }
 }
