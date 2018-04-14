@@ -45,5 +45,24 @@ namespace LibraryAppMVC.Models
         {
             public String Msg { get; set; }
         }
+
+        public class NewBook
+        {
+            public String Title { get; set; } = "No title";
+            public int PageCount { get; set; } = 0;
+            public List<int> AuthorIDs { get; set; } = new List<int>();
+            public String ISBN { get; set; } = "000-0000000000";
+            public String Authors { get; set; }
+            public String FicID { get; set; }
+            public String DeweyDecimal { get; set; }
+            public String Description { get; set; } = "No description";
+            public String ImagePath { get; set; } = "noimage.bmp";
+        }
+
+        public class NewAuthor
+        {
+            public String Name { get; set; }
+            public String AuthorType { get; set; }
+        }
     }
 }

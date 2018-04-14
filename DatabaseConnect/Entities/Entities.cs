@@ -16,6 +16,7 @@ namespace DatabaseConnect.Entities
         [Key]
         public int AuthorID { get; set; }
         public string Name { get; set; }
+        public String AuthorType { get; set; }
         public IEnumerable<AuthorBook> AuthorBooks { get; set; }
     }
 

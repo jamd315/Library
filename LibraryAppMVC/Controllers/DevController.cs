@@ -54,5 +54,63 @@ namespace LibraryAppMVC.Controllers
             _ctx.SaveChangesAsync();
             return Ok($"Successfully added user with ID {user.SchoolID}");
         }
+
+        [Route("addbook")]
+        [HttpPost]
+        public IActionResult AddBook([FromBody]NewBook nb)
+        {
+            Book book = new Book()
+            {
+                Title = nb.Title,
+                PageCount = nb.PageCount,
+                Description = nb.Description,
+                ImagePath = nb.ImagePath,
+                ISBN = nb.ISBN
+            };
+            if(nb.DeweyDecimal != null && nb.FicID == null)
+            {
+                book.DeweyDecimal = nb.DeweyDecimal;
+            }
+            else if(nb.FicID != null && nb.DeweyDecimal == null)
+            {
+                book.FicID = nb.FicID;
+            }
+            else if(nb.DeweyDecimal == null && nb.FicID == null)
+            {
+                return StatusCode(400, "Specify Dewey Decimal or Fiction ID");
+            }
+            else
+            {
+                return StatusCode(400, "Can not specify both Dewey Decimal and Fiction ID");
+            }
+            _ctx.Books.Add(book);
+            _ctx.SaveChanges();
+            foreach(int authID in nb.AuthorIDs)
+            {
+                _ctx.AuthorBook_rel.Add(
+                    new AuthorBook()
+                    {
+                        BookID = book.BookID,
+                        AuthorID = authID
+                    }
+                );
+            }
+            _ctx.SaveChanges();
+            return Ok();
+        }
+
+        [Route("addauthor")]
+        [HttpPost]
+        public IActionResult AddAuthor([FromBody]NewAuthor na)
+        {
+            Author author = new Author()
+            {
+                Name = na.Name,
+                AuthorType = na.AuthorType
+            };
+            _ctx.Add(author);
+            _ctx.SaveChanges();
+            return Ok();
+        }
     }
 }

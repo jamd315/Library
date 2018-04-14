@@ -54,6 +54,10 @@ namespace DatabaseConnect
                 .Property(ab => ab.AuthorID)
                 .HasDefaultValue(3);
 
+            modelBuilder.Entity<Author>()
+                .Property(a => a.AuthorType)
+                .HasDefaultValue("Author");
+
         }
     }
 }
