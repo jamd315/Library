@@ -42,6 +42,9 @@ namespace LibraryAppMVC.Controllers
         [Route("")]
         public async Task<IActionResult> Search([FromQuery] SearchRequest request)
         {
+            //_logger.Log(Json(request));
+            if(request == null) { return BadRequest(); }
+            if(request.Author == null && request.Title == null && request.Category == null && request.BookID == 0) { return BadRequest("You need to specify at least one category"); }
             
             
             var Books = await _ctx.Books
