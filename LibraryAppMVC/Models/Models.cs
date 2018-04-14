@@ -39,7 +39,11 @@ namespace LibraryAppMVC.Models
             public String Author { get; set; }
             public String Title { get; set; }
             public String Category { get; set; }
+        }
 
+        public class ReturnModel
+        {
+            public String Msg { get; set; }
         }
     }
 }
