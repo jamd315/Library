@@ -16,6 +16,8 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http.Headers;
 
 namespace LibraryAppMVC
 {
@@ -77,6 +79,18 @@ namespace LibraryAppMVC
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             var redirOpt = new RewriteOptions();
+            app.UseResponseCaching();
+            app.Use(async (context, next) =>
+            {
+                context.Response.GetTypedHeaders().CacheControl = new CacheControlHeaderValue()
+                {
+                    Public = true,
+                    MaxAge = TimeSpan.FromSeconds(60)
+                };
+                context.Response.Headers[HeaderNames.Vary] = new string[] { "Accept-Encoding" };
+
+                await next();
+            });
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -91,7 +105,6 @@ namespace LibraryAppMVC
 
             app.UseRewriter(redirOpt);
             app.UseAuthentication();
-            //app.UseResponseCaching();
 
             // Serve book images
             app.UseFileServer(new FileServerOptions
