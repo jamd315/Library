@@ -29,6 +29,10 @@ namespace LibraryAppMVC.Controllers
         [Route("checkout")]
         [HttpPost]
         [Authorize]
+        [ProducesResponseType(typeof(ReturnModel), 200)]
+        [ProducesResponseType(typeof(string), 404)]
+        [ProducesResponseType(typeof(string), 409)]
+        [ProducesResponseType(typeof(string), 409)]
         public IActionResult BookCheckout([FromBody]TransactionRequest request) // Checked 2/24/18 working
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -63,7 +67,7 @@ namespace LibraryAppMVC.Controllers
 
             if (CheckedOut)
             {
-                return StatusCode(410, "Already checked out");
+                return StatusCode(409, "Already checked out");
             }
             Checkout checkout = new Checkout { BookID = request.BookID, UserID = userID, Active = true, CheckoutDate = DateTime.Now, DueDate = DateTime.Now.AddDays(Int32.Parse(_cfg["CheckoutLengthDays"])) };
             _ctx.Checkouts
@@ -117,7 +121,7 @@ namespace LibraryAppMVC.Controllers
             if (!UserAlreadyReserved)
             {
                 _ctx.Reservations
-                    .Add(new Reservation { BookID = request.BookID, UserID = userID, Datetime = DateTime.Now, Active = true });
+                    .Add(new Reservation { BookID = request.BookID, UserID = userID, Datetime = DateTime.Now.ToUniversalTime(), Active = true });
                 _ctx.SaveChanges();
                 return Json(new ReturnModel() { Msg = "Reserved" });
             }

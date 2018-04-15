@@ -64,5 +64,11 @@ namespace LibraryAppMVC.Models
             public String Name { get; set; }
             public String AuthorType { get; set; }
         }
+
+        public class TokenObj
+        {
+            public String Token { get; set; }
+            public DateTime Expiration { get; set; }
+        }
     }
 }

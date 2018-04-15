@@ -6,6 +6,10 @@
     <ApplicationInsightsAnnotationResourceId>/subscriptions/33209090-52a3-493b-86cc-e777ca742682/resourcegroups/lizardswimmer_central/providers/microsoft.insights/components/lizardswimmer_insights</ApplicationInsightsAnnotationResourceId>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Remove="Properties\PublishProfiles\lizardswimmer - Web Deploy.pubxml" />
   </ItemGroup>

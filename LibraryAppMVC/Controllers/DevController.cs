@@ -1,5 +1,6 @@
 ﻿using DatabaseConnect;
 using DatabaseConnect.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -25,9 +26,9 @@ namespace LibraryAppMVC.Controllers
             _logger = logger;
             _cfg = config;
         }
-
         [Route("adduser")]
         [HttpPost]
+        [AllowAnonymous]  // TODO probably some auth
         public IActionResult AddUser([FromBody]NewUser newuser)
         {
             if (newuser.UserTypeInt == 0) { newuser.UserTypeInt = 1; }
@@ -57,6 +58,9 @@ namespace LibraryAppMVC.Controllers
 
         [Route("addbook")]
         [HttpPost]
+        [AllowAnonymous]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(string), 400)]
         public IActionResult AddBook([FromBody]NewBook nb)
         {
             Book book = new Book()
@@ -101,6 +105,8 @@ namespace LibraryAppMVC.Controllers
 
         [Route("addauthor")]
         [HttpPost]
+        [AllowAnonymous]
+        [ProducesResponseType(200)]
         public IActionResult AddAuthor([FromBody]NewAuthor na)
         {
             Author author = new Author()

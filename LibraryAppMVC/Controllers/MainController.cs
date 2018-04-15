@@ -3,13 +3,13 @@ using Microsoft.Extensions.Configuration;
 using System;
 
 namespace LibraryAppMVC.Controllers
-{
+{   
     [Route("")]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public class SwaggerRedirectController : Controller
+    public class RedirectController : Controller
     {
         private IConfiguration _cfg;
-        public SwaggerRedirectController(IConfiguration config)
+        public RedirectController(IConfiguration config)
         {
             _cfg = config;
         }

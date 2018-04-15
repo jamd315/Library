@@ -25,6 +25,7 @@ namespace LibraryAppMVC.Controllers
         [Route("books")]
         [AllowAnonymous]
         [HttpGet]
+        [ResponseCache(VaryByHeader="User-Agent", Duration=60)]
         public IActionResult GetABook(int page = 1) // Checked 2/25/18 working
         {
             int PerPageCount = Int32.Parse(_cfg["PerPageCount"]);
@@ -59,6 +60,7 @@ namespace LibraryAppMVC.Controllers
         [Route("checkouts")]
         [AllowAnonymous]
         [HttpGet]
+        [ResponseCache(VaryByHeader = "User-Agent", Duration = 60)]
         public IActionResult GetCheckouts() // Checked 2/25/18 working
         {
             var CheckoutList = _ctx.Checkouts
@@ -71,6 +73,7 @@ namespace LibraryAppMVC.Controllers
         [Route("reservations")]
         [AllowAnonymous]
         [HttpGet]
+        [ResponseCache(VaryByHeader = "User-Agent", Duration = 60)]
         public IActionResult GetReservations() // Checked 2/25/18 working
         {
             var CheckoutList = _ctx.Reservations

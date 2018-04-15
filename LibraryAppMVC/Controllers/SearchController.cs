@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using DatabaseConnect.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibraryAppMVC.Controllers
 {
@@ -40,6 +41,7 @@ namespace LibraryAppMVC.Controllers
         */
         [HttpGet]
         [Route("")]
+        [AllowAnonymous]
         public async Task<IActionResult> Search([FromQuery] SearchRequest request)
         {
             //_logger.Log(Json(request));

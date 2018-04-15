@@ -34,6 +34,8 @@ namespace LibraryAppMVC.Controllers
         [Route("login")]
         [AllowAnonymous]
         [HttpPost]
+        [ProducesResponseType(typeof(TokenObj), 200)]
+        [ProducesResponseType(typeof(string), 401)]
         public IActionResult CreateToken([FromBody]LoginModel login) // Checked 2/24/18 working
         {
             IActionResult response = StatusCode(401, "Bad login");
@@ -50,6 +52,7 @@ namespace LibraryAppMVC.Controllers
         [Route("logout")]
         [Authorize]
         [HttpPost]
+        [ProducesResponseType(200)]
         public IActionResult Logout() // Checked 2/24/18 NOT working TODO, maybe not important because client dumps token on logout
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -65,6 +68,7 @@ namespace LibraryAppMVC.Controllers
         [Route("info")]
         [Authorize]
         [HttpGet]
+        [ProducesResponseType(200)]
         public IActionResult UserInfo()
         {
             string schoolID = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -116,10 +120,10 @@ namespace LibraryAppMVC.Controllers
                 claims: claims
                 );
             return Ok(
-                new
+                new TokenObj()
                 {
-                    token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo
+                    Token = new JwtSecurityTokenHandler().WriteToken(token),
+                    Expiration = token.ValidTo
                 });
         }
 
