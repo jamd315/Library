@@ -60,9 +60,13 @@ namespace LibraryAppMVC
             services.AddSingleton(Configuration);
 
             services.AddDbContext<Context>(options => options.UseSqlServer(Configuration.GetConnectionString("TheDatabase")));
-            //services.AddResponseCaching();
+            services.AddResponseCaching();
             services.AddMvc()
-                .AddJsonOptions(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                    options.SerializerSettings.DateFormatString = "dd/MM/yyyy";
+                });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "FBLA Mobile App", Version = "v1" });
